@@ -2,6 +2,7 @@
 
 from sqlalchemy import func
 from model import User
+from datetime import datetime
 # from model import Rating
 # from model import Movie
 
@@ -36,6 +37,30 @@ def load_users():
 
 def load_movies():
     """Load movies from u.item into database."""
+
+    print "Movies"
+
+    Movies.query.delete()
+
+    for row in open("seed_data/u.item"):
+        row = row.rstrip()
+
+        movie_id, title, release_date, vid_release_date, imdb_url,
+        unknown, action, adventure, animation, childrens, comedy, crime,
+        documentary, drama, fantasy, film_noir, horror, musical, mystery,
+        romance, scifi, thriller, war, western = row.split("|")
+
+        release_date = datetime.strptime(release_date, "%d-%b-%Y")
+
+
+        movie = Movie(movie_id=movie_id,
+                      title=title[:-7],
+                      release_date=release_date,
+                      imdb_url=imdb_url)
+
+        db.session.add(movie)
+
+    db.session.commit()
 
 
 def load_ratings():
