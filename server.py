@@ -2,10 +2,11 @@
 
 from jinja2 import StrictUndefined
 
-from flask import Flask, jsonify
+from flask import (Flask, jsonify, render_template, redirect, request, flash,
+                   session)
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db
+from model import User, Rating, Movie, connect_to_db, db
 
 
 app = Flask(__name__)
@@ -22,8 +23,51 @@ app.jinja_env.undefined = StrictUndefined
 @app.route('/')
 def index():
     """Homepage."""
-    a = jsonify([1,3])
-    return a
+
+    return render_template("homepage.html")
+
+
+@app.route('/users')
+def user_list():
+    """Show list of users."""
+
+    users = User.query.all()
+    return render_template("user_list.html", users=users)
+
+
+@app.route('/login')
+def login_form():
+    """Show login page."""
+
+    return render_template("login_page.html")
+
+
+@app.route('/login')
+def login_process():
+    """Redirect to homepage after login."""
+
+    # get username and pw from login form
+    # query database for existence of username
+    # if username exists, get matching password
+        # compare database password to entered password
+        # redirect to homepage
+    # if username doesn't exist:
+        # create account and add user (and commit to DB)
+        # redirect to homepage
+
+    entered_username = request.form.get("username")
+    entered_password = request.form.get("password")
+
+    if db.session.query(User).filter(User.email == "entered_username").one() != 0:
+        user = User.user_id
+        db_password = db.session.query(User).filter(Use)
+        if entered_password ==
+    else:
+        pass # create account 
+
+
+    return redirect('/')
+
 
 
 if __name__ == "__main__":
