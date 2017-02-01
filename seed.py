@@ -43,12 +43,9 @@ def load_movies():
     Movie.query.delete()
 
     for row in open("seed_data/u.item"):
-        row = row.rstrip()
+        row = row.rstrip().split("|")
 
-        (movie_id, title, released_str, vid_release_date, imdb_url, 
-        unknown, action, adventure, animation, childrens, comedy, crime,
-        documentary, drama, fantasy, film_noir, horror, musical, mystery,
-        romance, scifi, thriller, war, western) = row.split("|")
+        (movie_id, title, released_str, vid_release_date, imdb_url) = row[:5]
 
         # Converting release_date string to a datetime object
 
@@ -78,12 +75,11 @@ def load_ratings():
     for row in open('seed_data/u.data'):
         row = row.rstrip()
 
-        user_id, movie_id, score, timestamp = row.split(' ')
+        user_id, movie_id, score, _ = row.split('\t')
 
         rating = Rating(user_id=user_id,
                         movie_id=movie_id,
-                        score=score,
-                        timestamp=timestamp)
+                        score=score)
 
         db.session.add(rating)
 
