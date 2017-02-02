@@ -1,7 +1,7 @@
 """Movie Ratings."""
 
 from jinja2 import StrictUndefined
-
+import sqlalchemy
 from flask import (Flask, jsonify, render_template, redirect, request, flash,
                    session)
 from flask_debugtoolbar import DebugToolbarExtension
@@ -57,9 +57,13 @@ def login_process():
 
     entered_username = request.form.get("username")
     entered_password = request.form.get("password")
+
+    # Using try-except because .one() will return an error if the email is not
+    # in the database. Except statement handles adding a new user.
+
     try:
         user = db.session.query(User).filter(User.email == entered_username).one()
-    except:
+    except sqlalchemy.orm.exc.NoResultFound:
         user = User(email=entered_username, password=entered_password)
         db.session.add(user)
         db.session.commit()
@@ -80,6 +84,34 @@ def logout():
     session.pop('current_user', None)
     flash('You have been logged out')
     return redirect('/login')
+
+
+@app.route('/user-info')
+def load_user_info():
+
+    user = request.args.get('user_id')
+    user_info = db.session.query(User).filter(User.user_id == user).first()
+    age = user_info.age
+    zipcode = user_info.zipcode
+    rated_movies_obj = db.session.query(Rating).filter(Rating.user_id == user).all()
+
+    rated_movies = []
+
+    for movie in rated_movies_obj:
+        title = db.session.query(Movie).filter(Movie.title == movie_id)
+
+        # for loop
+        # query for title using movie_id from rated_movies_obj
+        # bind score from rated_movies_obj to score variable
+        # create tuple with title and score
+        # add tuple to rated_movies list
+        # pass rated_movies list to jinja
+
+    return render_template('user_details.html', user_id=user,
+                                                age=age,
+                                                zipcode=zipcode,
+                                                rated_movies=rated_movies)
+
 
 
 if __name__ == "__main__":
