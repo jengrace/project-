@@ -42,7 +42,7 @@ def login_form():
     return render_template("login_page.html")
 
 
-@app.route('/login')
+@app.route('/handle-login', methods=['POST'])
 def login_process():
     """Redirect to homepage after login."""
 
@@ -57,17 +57,29 @@ def login_process():
 
     entered_username = request.form.get("username")
     entered_password = request.form.get("password")
+    try:
+        user = db.session.query(User).filter(User.email == entered_username).one()
+    except:
+        user = User(email=entered_username, password=entered_password)
+        db.session.add(user)
+        db.session.commit()
+        flash('Account created. Logged in as %s.' % entered_username)
+        return redirect('/')
 
-    if db.session.query(User).filter(User.email == "entered_username").one() != 0:
-        user = User.user_id
-        db_password = db.session.query(User).filter(Use)
-        if entered_password ==
+    if entered_password == user.password:
+        session['current_user'] = entered_username
+        flash('Logged in as %s' % entered_username)
+        return redirect('/')
     else:
-        pass # create account 
+        flash('Incorrect username or password.')
+        return redirect('/login')
 
 
-    return redirect('/')
-
+@app.route('/logout')
+def logout():
+    session.pop('current_user', None)
+    flash('You have been logged out')
+    return redirect('/login')
 
 
 if __name__ == "__main__":
@@ -80,7 +92,5 @@ if __name__ == "__main__":
 
     # Use the DebugToolbar
     DebugToolbarExtension(app)
-
-
-    
+    app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
     app.run(port=5000, host='0.0.0.0')
