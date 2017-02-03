@@ -90,29 +90,34 @@ def logout():
 def load_user_info():
 
     user = request.args.get('user_id')
-    user_info = db.session.query(User).filter(User.user_id == user).first()
-    age = user_info.age
-    zipcode = user_info.zipcode
-    rated_movies_obj = db.session.query(Rating).filter(Rating.user_id == user).all()
+    user_info = db.session.query(User.user_id,
+                                 User.age,
+                                 User.zipcode,
+                                 Rating.movie_id).join(Rating).filter(User.user_id == user).first()
 
-    rated_movies = []
+    rated_movies_obj = db.session.query(Rating.rating_id,
+                                        Rating.score,
+                                        Movie.title).join(Movie).filter(Rating.user_id == user).all()
 
-    for movie in rated_movies_obj:
-        title = db.session.query(Movie).filter(Movie.title == movie_id)
-
-        # for loop
-        # query for title using movie_id from rated_movies_obj
-        # bind score from rated_movies_obj to score variable
-        # create tuple with title and score
-        # add tuple to rated_movies list
-        # pass rated_movies list to jinja
-
-    return render_template('user_details.html', user_id=user,
-                                                age=age,
-                                                zipcode=zipcode,
-                                                rated_movies=rated_movies)
+    return render_template('user_details.html', user_info=user_info,
+                                                rated_movies_obj=rated_movies_obj)
 
 
+@app.route('/movies')
+def movie_list():
+
+    movies = Movie.query.order_by(Movie.title).all()
+
+    return render_template('movies_list.html', movies=movies)
+
+
+@app.route('/movie-info')
+def load_movie_info():
+
+    movie = request.args.get('movie_id')
+    movie_info = db.session.query(Movie.title).filter(Movie.movie_id == movie).one()
+
+    return render_template('movies_details.html', movie_info=movie_info)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
