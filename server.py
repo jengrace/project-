@@ -6,7 +6,7 @@ from flask import (Flask, jsonify, render_template, redirect, request, flash,
                    session)
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import User, Rating, Movie, connect_to_db, db
+from model import connect_to_db, db
 
 
 app = Flask(__name__)
