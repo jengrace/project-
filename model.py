@@ -19,14 +19,14 @@ class Admin(db.Model):
 
     admin_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(64), nullable=True)
-    password = db.Column(db.String(64), nullable=False)
-    username = db.Column(db.String(70), nullable=False)
-    shelter_id = db.Column(db.Integer, db.ForeignKey('shelters.shelter_id'))
+    password = db.Column(db.String(64), nullable=True)
+    username = db.Column(db.String(70), nullable=True)
+    shelter_id = db.Column(db.Integer, db.ForeignKey('shelters.shelter_id'), nullable=False)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Admin admin_id=%s email=%s username %s password %s>" % (
+        return "<Admin admin_id=%s email=%s username=%s password=%s>" % (
                                                                 self.admin_id,
                                                                 self.email,
                                                                 self.username,
@@ -40,12 +40,12 @@ class Animal(db.Model):
     __tablename__ = "animals"
 
     animal_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    age = db.Column(db.DateTime, nullable=False)  # drop down menu with young, medium, senior....
+    #age = db.Column(db.DateTime, nullable=True)  # drop down menu with young, medium, senior....
     img_url = db.Column(db.String(300), nullable=True)
     gender = db.Column(db.String(20), nullable=True)
     breed = db.Column(db.String(40), nullable=True)
     name = db.Column(db.String(40), nullable=True)
-    shelter_id = db.Column(db.Integer, db.ForeignKey('shelters.shelter_id'))
+    shelter_id = db.Column(db.Integer, db.ForeignKey('shelters.shelter_id'), nullable=False)
     #timestamp
 
     def __repr__(self):
@@ -65,12 +65,13 @@ class Shelter(db.Model):
     __tablename__ = "shelters"
 
     shelter_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=True)
     phone = db.Column(db.String(30), nullable=True)
-    address = db.Column(db.String(200), nullable=False)
-    animal_id = db.Column(db.Integer, db.ForeignKey('animals.animal_id'))
-    email = db.Column(db.String(64), nullable=False)
+    address = db.Column(db.String(200), nullable=True)
+    #animal_id = db.Column(db.Integer, db.ForeignKey('animals.animal_id'), nullable=False)
+    email = db.Column(db.String(64), nullable=True)
     img_url = db.Column(db.String(300), nullable=True)
+    admin_id = db.Column(db.Integer, db.ForeignKey('admins.admin_id'), nullable=False)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -108,7 +109,7 @@ class ShelterUser(db.Model):
     __tablename__ = "shelter_users"
 
     su_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=True)
     shelter_id = db.Column(db.Integer, db.ForeignKey('shelters.shelter_id'), nullable=False)
 
     # Defining relationships with other tables:
@@ -116,13 +117,13 @@ class ShelterUser(db.Model):
     #shelter = db.relationship("Shelter", backref=db.backref("shelter_users"))
 
 
-    def __repr__(self):
-        """Provide helpful representation when printed."""
+    # def __repr__(self):
+    #     """Provide helpful representation when printed."""
 
-        return "<Rating rating_id=%s movie_id=%s user_id=%s>" % (
-                                                                self.rating_id,
-                                                                self.movie_id,
-                                                                self.user_id)
+    #     return "<Rating rating_id=%s movie_id=%s user_id=%s>" % (
+    #                                                             self.rating_id,
+    #                                                             self.movie_id,
+    #                                                             self.user_id)
 
 # class Transaction(db.Model):
 #     """ Redirecting users to PayPal to allow donations for rescues """
