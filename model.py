@@ -40,12 +40,12 @@ class Animal(db.Model):
     __tablename__ = "animals"
 
     animal_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    #born_at = db.Column(db.DateTime, nullable=False) #integer or string? format of date? datetime?
+    age = db.Column(db.DateTime, nullable=False)  # drop down menu with young, medium, senior....
     img_url = db.Column(db.String(300), nullable=True)
     gender = db.Column(db.String(20), nullable=True)
     breed = db.Column(db.String(40), nullable=True)
     name = db.Column(db.String(40), nullable=True)
-    shelter_id = db.Column(db.Integer, db.ForeignKey('shelters.shelter_id'), nullable=False)
+    shelter_id = db.Column(db.Integer, db.ForeignKey('shelters.shelter_id'))
     #timestamp
 
     def __repr__(self):
@@ -67,7 +67,10 @@ class Shelter(db.Model):
     shelter_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(30), nullable=True)
-    location = db.Column(db.String(200), nullable=False)
+    address = db.Column(db.String(200), nullable=False)
+    animal_id = db.Column(db.Integer, db.ForeignKey('animals.animal_id'))
+    email = db.Column(db.String(64), nullable=False)
+    img_url = db.Column(db.String(300), nullable=True)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -76,7 +79,7 @@ class Shelter(db.Model):
                                                                 self.shelter_id,
                                                                 self.name,
                                                                 self.phone,
-                                                                self.location)
+                                                                self.address)
 
 
 class User(db.Model):
@@ -85,7 +88,7 @@ class User(db.Model):
     __tablename__ = "users"
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    email = db.Column(db.String(64), nullable=True)
+    email = db.Column(db.String(64), nullable=False)
     password = db.Column(db.String(64), nullable=True)
     zipcode = db.Column(db.String(15), nullable=True)
 
@@ -109,8 +112,9 @@ class ShelterUser(db.Model):
     shelter_id = db.Column(db.Integer, db.ForeignKey('shelters.shelter_id'), nullable=False)
 
     # Defining relationships with other tables:
-    user = db.relationship("User", backref=db.backref("shelter_users"))
-    shelter = db.relationship("Shelter", backref=db.backref("shelter_users"))
+    #user = db.relationship("User", backref=db.backref("shelter_users"))
+    #shelter = db.relationship("Shelter", backref=db.backref("shelter_users"))
+
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -119,6 +123,16 @@ class ShelterUser(db.Model):
                                                                 self.rating_id,
                                                                 self.movie_id,
                                                                 self.user_id)
+
+# class Transaction(db.Model):
+#     """ Redirecting users to PayPal to allow donations for rescues """
+
+#     trans_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+#     amount = db.Column(db.Integet, nullable=False)
+#     pay_pal_token =
+#     user_id = 
+#     shelter_id = 
+#     donated_at = db.Column(db.DateTime, nullable=False)
 
 ##############################################################################
 # Helper functions
@@ -138,4 +152,5 @@ if __name__ == "__main__":
 
     from server import app
     connect_to_db(app)
+    db.create_all()
     print "Connected to DB."
