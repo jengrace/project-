@@ -1,0 +1,9 @@
+animals (separate animals table to species or make a species id?)
+    dogs
+    cats 
+
+bycrypt (hashing passwords)
+
+date for born at
+
+timestamps of each entry

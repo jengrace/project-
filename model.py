@@ -1,4 +1,4 @@
-"""Models and database functions for Ratings project."""
+"""Models and database functions for CMS project."""
 
 from flask_sqlalchemy import SQLAlchemy
 
@@ -20,18 +20,16 @@ class Admin(db.Model):
     admin_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(64), nullable=True)
     password = db.Column(db.String(64), nullable=True)
-    username = db.Column(db.String(70), nullable=True)
-    shelter_id = db.Column(db.Integer, db.ForeignKey('shelters.shelter_id'), nullable=False)
+    shelter_id = db.Column(db.Integer, db.ForeignKey('shelters.shelter_id'), nullable=True)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Admin admin_id=%s email=%s username=%s password=%s>" % (
-                                                                self.admin_id,
-                                                                self.email,
-                                                                self.username,
-                                                                self.password
-                                                                )
+        return "<Admin admin_id=%s email=%s username=%s password=%s shelter_id=%s>" % (self.admin_id,
+                                                                                       self.email,
+                                                                                       self.username,
+                                                                                       self.password,
+                                                                                       self.shelter_id)
 
 
 class Animal(db.Model):
@@ -40,23 +38,22 @@ class Animal(db.Model):
     __tablename__ = "animals"
 
     animal_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    #age = db.Column(db.DateTime, nullable=True)  # drop down menu with young, medium, senior....
-    img_url = db.Column(db.String(300), nullable=True)
+    #age = db.Column(db.DateTime, nullable=True, default='young')  # drop down menu with young, medium, senior....
+    #img_url = db.Column(db.String(300), nullable=True, default='/static/images/dog.png')
     gender = db.Column(db.String(20), nullable=True)
     breed = db.Column(db.String(40), nullable=True)
     name = db.Column(db.String(40), nullable=True)
-    shelter_id = db.Column(db.Integer, db.ForeignKey('shelters.shelter_id'), nullable=False)
-    #timestamp
+    shelter_id = db.Column(db.Integer, db.ForeignKey('shelters.shelter_id'), nullable=True)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Animal animal_id=%s img_url=%s gender=%s breed=%s name=%s>" % (
-                                                                self.animal_id,
-                                                                self.img_url,
-                                                                self.gender,
-                                                                self.breed,
-                                                                self.name)
+        return "<Animal animal_id=%s img_url=%s gender=%s breed=%s name=%s shelter_id=%s>" % (self.animal_id,
+                                                                                              self.img_url,
+                                                                                              self.gender,
+                                                                                              self.breed,
+                                                                                              self.name,
+                                                                                              self.shelter_id)
 
 
 class Shelter(db.Model):
@@ -68,19 +65,16 @@ class Shelter(db.Model):
     name = db.Column(db.String(100), nullable=True)
     phone = db.Column(db.String(30), nullable=True)
     address = db.Column(db.String(200), nullable=True)
-    #animal_id = db.Column(db.Integer, db.ForeignKey('animals.animal_id'), nullable=False)
     email = db.Column(db.String(64), nullable=True)
-    img_url = db.Column(db.String(300), nullable=True)
-    admin_id = db.Column(db.Integer, db.ForeignKey('admins.admin_id'), nullable=False)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Shelter shelter_id=%s name=%s phone=%s location=%s>" % (
-                                                                self.shelter_id,
-                                                                self.name,
-                                                                self.phone,
-                                                                self.address)
+        return "<Shelter shelter_id=%s name=%s phone=%s address=%s> email=%s" % (self.shelter_id,
+                                                                                 self.name,
+                                                                                 self.phone,
+                                                                                 self.address,
+                                                                                 self.email)
 
 
 class User(db.Model):
@@ -89,7 +83,7 @@ class User(db.Model):
     __tablename__ = "users"
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    email = db.Column(db.String(64), nullable=False)
+    email = db.Column(db.String(64), nullable=True)
     password = db.Column(db.String(64), nullable=True)
     zipcode = db.Column(db.String(15), nullable=True)
 
@@ -109,7 +103,7 @@ class ShelterUser(db.Model):
     __tablename__ = "shelter_users"
 
     su_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     shelter_id = db.Column(db.Integer, db.ForeignKey('shelters.shelter_id'), nullable=False)
 
     # Defining relationships with other tables:

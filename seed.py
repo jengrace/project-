@@ -1,102 +1,103 @@
 """Utility file to seed ratings database from MovieLens data in seed_data/"""
 
 from sqlalchemy import func
-from model import User
 from datetime import datetime
-from model import Rating
-from model import Movie
+from model import Admin
+from model import Animal
+from model import Shelter
 
 from model import connect_to_db, db
 from server import app
 
 
-def load_users():
-    """Load users from u.user into database."""
+def load_admins():
+    """Load admins from u.admin into database."""
 
-    print "Users"
+    print "Administrators"
 
     # Delete all rows in table, so if we need to run this a second time,
     # we won't be trying to add duplicate users
-    User.query.delete()
+    #Admin.query.delete()
 
-    # Read u.user file and insert data
-    for row in open("seed_data/u.user"):
+    # Read u.admin file and insert data
+    for row in open("seed_data/u.admin"):
         row = row.rstrip()
-        user_id, age, gender, occupation, zipcode = row.split("|")
+        admin_id, email, password, shelter_id = row.split("|")
 
-        user = User(user_id=user_id,
-                    age=age,
-                    zipcode=zipcode)
+        admin = Admin(admin_id=admin_id,
+                      email=email,
+                      password=password,
+                      shelter_id=shelter_id)
 
         # We need to add to the session or it won't ever be stored
-        db.session.add(user)
+        db.session.add(admin)
 
     # Once we're done, we should commit our work
     db.session.commit()
 
 
-def load_movies():
-    """Load movies from u.item into database."""
+def load_shelters():
+    """Load shelters from u.shelter into database."""
 
-    print "Movies"
+    print "Shelters"
 
-    Movie.query.delete()
+    #Shelter.query.delete()
 
-    for row in open("seed_data/u.item"):
-        row = row.rstrip().split("|")
+    for row in open('seed_data/u.shelter'):
+        row = row.rstrip()
+        shelter_id, name, phone, address, email = row.split("|")
 
-        (movie_id, title, released_str, vid_release_date, imdb_url) = row[:5]
+        shelter = Shelter(shelter_id=shelter_id,
+                          name=name,
+                          phone=phone,
+                          address=address,
+                          email=email)
+
+        db.session.add(shelter)
+
+    db.session.commit()
+
+
+def load_animals():
+    """Load animals from u.animal into database."""
+
+    print "Animals"
+
+    #Animal.query.delete()
+
+    for row in open("seed_data/u.animal"):
+        row = row.rstrip()
+        print 'row: ', row
+        animal_id, gender, breed, name, shelter_id = row.split("|")
+        animal = Animal(animal_id=animal_id,
+                        #age=age,
+                        #img_url=img_url,
+                        gender=gender,
+                        breed=breed,
+                        name=name,
+                        shelter_id=shelter_id)
 
         # Converting release_date string to a datetime object
 
-        if released_str:
-            released_at = datetime.strptime(released_str, "%d-%b-%Y")
-        else:
-            released_at = None
+        # if released_str:
+        #     released_at = datetime.strptime(released_str, "%d-%b-%Y")
+        # else:
+        #     released_at = None
 
-
-        movie = Movie(movie_id=movie_id,
-                      title=title[:-7],
-                      released_at=released_at,
-                      imdb_url=imdb_url)
-
-        db.session.add(movie)
+        db.session.add(animal)
 
     db.session.commit()
-
-
-def load_ratings():
-    """Load ratings from u.data into database."""
-
-    print "Ratings"
-
-    Rating.query.delete()
-
-    for row in open('seed_data/u.data'):
-        row = row.rstrip()
-
-        user_id, movie_id, score, _ = row.split('\t')
-
-        rating = Rating(user_id=user_id,
-                        movie_id=movie_id,
-                        score=score)
-
-        db.session.add(rating)
-
-    db.session.commit()
-
-
 
 
 def set_val_user_id():
     """Set value for the next user_id after seeding database"""
 
     # Get the Max user_id in the database
-    result = db.session.query(func.max(User.user_id)).one()
+    result = db.session.query(func.max(Admin.admin_id)).one()
     max_id = int(result[0])
 
     # Set the value for the next user_id to be max_id + 1
-    query = "SELECT setval('users_user_id_seq', :new_id)"
+    query = "SELECT setval('admins_admin_id_seq', :new_id)"
     db.session.execute(query, {'new_id': max_id + 1})
     db.session.commit()
 
@@ -104,11 +105,13 @@ def set_val_user_id():
 if __name__ == "__main__":
     connect_to_db(app)
 
+    db.drop_all()
+
     # In case tables haven't been created, create them
     db.create_all()
 
     # Import different types of data
-    load_users()
-    load_movies()
-    load_ratings()
+    load_shelters()
+    load_admins()
+    load_animals()
     set_val_user_id()
