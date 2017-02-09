@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Rescue #: {{ rescue_info.rescue_id }}
+<br>
+<br> -->
+Name: {{ rescue_info.name }}
+<br>
+<br>
+<img src= "{{ rescue_info.img_url }}" alt="GPR" style="">
+<br>
+<br>
+Address: {{ rescue_info.address }}
+<br>
+<br>
+Email: {{ rescue_info.email}}
+<br>
+<br>
+Phone: {{ rescue_info.phone }}
+{% endblock %}

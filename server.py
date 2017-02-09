@@ -6,7 +6,7 @@ from flask import (Flask, jsonify, render_template, redirect, request, flash,
                    session)
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db
+from model import Rescue, connect_to_db, db
 
 
 app = Flask(__name__)
@@ -24,100 +24,118 @@ app.jinja_env.undefined = StrictUndefined
 def index():
     """Homepage."""
 
-    return render_template("homepage.html")
+    rescues = Rescue.query.all()
+
+    return render_template('homepage.html',
+                           rescues=rescues)
 
 
-@app.route('/users')
-def user_list():
-    """Show list of users."""
+@app.route('/rescue-info')
+def load_shelter_info():
 
-    users = User.query.all()
-    return render_template("user_list.html", users=users)
+    rescue = request.args.get('rescue_id')
+    print 'rescue: ', rescue
+    rescue_info = db.session.query(Rescue.rescue_id,
+                                   Rescue.name,
+                                   Rescue.phone,
+                                   Rescue.address,
+                                   Rescue.email,
+                                   Rescue.img_url).filter(Rescue.rescue_id == rescue).first()
+    print 'hehueehuehuee:', rescue_info
+    return render_template('rescue_info.html',
+                           rescue_info=rescue_info)
 
+# @app.route('/users')
+# def user_list():
+#     """Show list of users."""
 
-@app.route('/login')
-def login_form():
-    """Show login page."""
-
-    return render_template("login_page.html")
-
-
-@app.route('/handle-login', methods=['POST'])
-def login_process():
-    """Redirect to homepage after login."""
-
-    # get username and pw from login form
-    # query database for existence of username
-    # if username exists, get matching password
-        # compare database password to entered password
-        # redirect to homepage
-    # if username doesn't exist:
-        # create account and add user (and commit to DB)
-        # redirect to homepage
-
-    entered_username = request.form.get("username")
-    entered_password = request.form.get("password")
-
-    # Using try-except because .one() will return an error if the email is not
-    # in the database. Except statement handles adding a new user.
-
-    try:
-        user = db.session.query(User).filter(User.email == entered_username).one()
-    except sqlalchemy.orm.exc.NoResultFound:
-        user = User(email=entered_username, password=entered_password)
-        db.session.add(user)
-        db.session.commit()
-        flash('Account created. Logged in as %s.' % entered_username)
-        return redirect('/')
-
-    if entered_password == user.password:
-        session['current_user'] = entered_username
-        flash('Logged in as %s' % entered_username)
-        return redirect('/')
-    else:
-        flash('Incorrect username or password.')
-        return redirect('/login')
+#     users = User.query.all()
+#     return render_template("user_list.html", users=users)
 
 
-@app.route('/logout')
-def logout():
-    session.pop('current_user', None)
-    flash('You have been logged out')
-    return redirect('/login')
+# @app.route('/login')
+# def login_form():
+#     """Show login page."""
+
+#     return render_template("login_page.html")
 
 
-@app.route('/user-info')
-def load_user_info():
+# @app.route('/handle-login', methods=['POST'])
+# def login_process():
+#     """Redirect to homepage after login."""
 
-    user = request.args.get('user_id')
-    user_info = db.session.query(User.user_id,
-                                 User.age,
-                                 User.zipcode,
-                                 Rating.movie_id).join(Rating).filter(User.user_id == user).first()
+#     # get username and pw from login form
+#     # query database for existence of username
+#     # if username exists, get matching password
+#         # compare database password to entered password
+#         # redirect to homepage
+#     # if username doesn't exist:
+#         # create account and add user (and commit to DB)
+#         # redirect to homepage
 
-    rated_movies_obj = db.session.query(Rating.rating_id,
-                                        Rating.score,
-                                        Movie.title).join(Movie).filter(Rating.user_id == user).all()
+#     entered_username = request.form.get("username")
+#     entered_password = request.form.get("password")
 
-    return render_template('user_details.html', user_info=user_info,
-                                                rated_movies_obj=rated_movies_obj)
+#     # Using try-except because .one() will return an error if the email is not
+#     # in the database. Except statement handles adding a new user.
+
+#     try:
+#         user = db.session.query(User).filter(User.email == entered_username).one()
+#     except sqlalchemy.orm.exc.NoResultFound:
+#         user = User(email=entered_username, password=entered_password)
+#         db.session.add(user)
+#         db.session.commit()
+#         flash('Account created. Logged in as %s.' % entered_username)
+#         return redirect('/')
+
+#     if entered_password == user.password:
+#         session['current_user'] = entered_username
+#         flash('Logged in as %s' % entered_username)
+#         return redirect('/')
+#     else:
+#         flash('Incorrect username or password.')
+#         return redirect('/login')
 
 
-@app.route('/movies')
-def movie_list():
+# @app.route('/logout')
+# def logout():
+#     session.pop('current_user', None)
+#     flash('You have been logged out')
+#     return redirect('/login')
 
-    movies = Movie.query.order_by(Movie.title).all()
 
-    return render_template('movies_list.html', movies=movies)
+# @app.route('/user-info')
+# def load_user_info():
+
+#     user = request.args.get('user_id')
+#     user_info = db.session.query(User.user_id,
+#                                  User.age,
+#                                  User.zipcode,
+#                                  Rating.movie_id).join(Rating).filter(User.user_id == user).first()
+
+#     rated_movies_obj = db.session.query(Rating.rating_id,
+#                                         Rating.score,
+#                                         Movie.title).join(Movie).filter(Rating.user_id == user).all()
+
+#     return render_template('user_details.html', user_info=user_info,
+#                                                 rated_movies_obj=rated_movies_obj)
 
 
-@app.route('/movie-info')
-def load_movie_info():
+# @app.route('/movies')
+# def movie_list():
 
-    movie = request.args.get('movie_id')
-    movie_info = db.session.query(Movie.title).filter(Movie.movie_id == movie).one()
+#     movies = Movie.query.order_by(Movie.title).all()
 
-    return render_template('movies_details.html', movie_info=movie_info)
+#     return render_template('movies_list.html', movies=movies)
+
+
+# @app.route('/movie-info')
+# def load_movie_info():
+
+#     movie = request.args.get('movie_id')
+#     movie_info = db.session.query(Movie.title).filter(Movie.movie_id == movie).one()
+
+#     return render_template('movies_details.html', movie_info=movie_info)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

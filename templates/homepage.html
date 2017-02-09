@@ -1,7 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{% with messages = get_flashed_messages() %}
+<h2> Animal Rescues </h2>
+<ul>
+  {% for rescue in rescues %}
+    <li>
+      <a href="/rescue-info?rescue_id={{ rescue.rescue_id }}">
+        {{ rescue.name }}
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+<!--{% with messages = get_flashed_messages() %}
   {% if messages %}
     <ul class=flashes>
     {% for message in messages %}
@@ -28,6 +38,6 @@
 
 <h2>Users</h2>
 <p><a href="/users">View all users</a></p>
-
+-->
 
 {% endblock %}
