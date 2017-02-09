@@ -92,9 +92,8 @@ def load_animals():
 
     for row in open("seed_data/u.animal"):
         row = row.rstrip()
-        animal_id, img_url, breed, name, rescue_id, animal_type_id, gender_id, age_id, size_id = row.split("|")
+        animal_id, breed, name, rescue_id, animal_type_id, gender_id, age_id, size_id = row.split("|")
         animal = Animal(animal_id=animal_id,
-                        img_url=img_url,
                         breed=breed,
                         name=name,
                         rescue_id=rescue_id,
