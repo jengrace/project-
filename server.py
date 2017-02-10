@@ -1,4 +1,4 @@
-"""Movie Ratings."""
+"""Site for animal rescues to administers"""
 
 from jinja2 import StrictUndefined
 import sqlalchemy
@@ -6,7 +6,7 @@ from flask import (Flask, jsonify, render_template, redirect, request, flash,
                    session)
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import Rescue, connect_to_db, db
+from model import Rescue, Animal, Gender, Size, Age, connect_to_db, db
 
 
 app = Flask(__name__)
@@ -30,20 +30,44 @@ def index():
                            rescues=rescues)
 
 
-@app.route('/rescue-info')
-def load_shelter_info():
+#@app.route('/rescues/<int:rescue_id>')
 
-    rescue = request.args.get('rescue_id')
-    print 'rescue: ', rescue
+@app.route('/rescues/<rescue_name>')
+def load_shelter_info(rescue_name):
+
+    #rescue = request.args.get('rescue_id')
     rescue_info = db.session.query(Rescue.rescue_id,
                                    Rescue.name,
                                    Rescue.phone,
                                    Rescue.address,
                                    Rescue.email,
-                                   Rescue.img_url).filter(Rescue.rescue_id == rescue).first()
-    print 'hehueehuehuee:', rescue_info
+                                   Rescue.img_url).filter(Rescue.name == rescue_name).first()
+
+    animals = Animal.query.all()
+
     return render_template('rescue_info.html',
-                           rescue_info=rescue_info)
+                           rescue_info=rescue_info,
+                           animals=animals)
+
+
+@app.route('/rescues/<rescue_name>/<animal_name>')
+def load_animal_info(rescue_name, animal_name):
+
+    animal_info = db.session.query(Animal.animal_id,
+                                   Animal.img_url,
+                                   Animal.breed,
+                                   Animal.name,
+                                   Animal.rescue_id,
+                                   Animal.animal_type_id,
+                                   Animal.gender_id,
+                                   Animal.age_id,
+                                   Animal.size_id,
+                                   Gender.gender_name,
+                                   Age.age_category,
+                                   Size.size_category).join(Gender, Age, Size).filter(Animal.name == animal_name).first()
+    print '********************', animal_info
+    return render_template('animal_info.html',
+                            animal_info=animal_info)
 
 # @app.route('/users')
 # def user_list():

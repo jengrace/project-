@@ -1,10 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- Rescue #: {{ rescue_info.rescue_id }}
-<br>
-<br> -->
-Name: {{ rescue_info.name }}
+<h2> {{ rescue_info.name }} </h2>
 <br>
 <br>
 <img src= "{{ rescue_info.img_url }}" alt="GPR" style="">
@@ -17,4 +14,16 @@ Email: {{ rescue_info.email}}
 <br>
 <br>
 Phone: {{ rescue_info.phone }}
+
+<!-- Add image of animal inside of a link, link leads to animal's info -->
+<h2> Dogs: </h2>
+{% for animal in animals %}
+  {{ animal.name }}
+  <br>
+  <a href = "/rescues/{{rescue_info.name}}/{{ animal.name }}">
+    <img alt="portrait" src = "{{ animal.img_url }}">
+  </a>
+  <br>
+{% endfor %}
+
 {% endblock %}

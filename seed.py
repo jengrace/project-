@@ -3,10 +3,6 @@
 from sqlalchemy import func
 #from datetime import datetime
 from model import Admin, Animal, Rescue, Age, Gender, Size, AnimalType, User
-#from model import Animal
-#from model import Rescue
-#from model import Age, Gen
-
 from model import connect_to_db, db
 from server import app
 
@@ -15,10 +11,6 @@ def load_admins():
     """Load admins from u.admin into database."""
 
     print "Administrators"
-
-    # Delete all rows in table, so if we need to run this a second time,
-    # we won't be trying to add duplicate users
-    #Admin.query.delete()
 
     # Read u.admin file and insert data
     for row in open("seed_data/u.admin"):
@@ -57,34 +49,6 @@ def load_rescues():
     db.session.commit()
 
 
-# def load_animals():
-#     """Load animals from u.animal into database."""
-
-#     print "Animals"
-
-#     for row in open("seed_data/u.animal"):
-#         row = row.rstrip()
-#         print 'row: ', row
-#         animal_id, img_url, breed, name, rescue_id, animal_type_id, gender_id, age_id, size_id = row.split("|")
-#         animal = Animal(animal_id=animal_id,
-#                         #age=age,
-#                         #img_url=img_url,
-#                         gender=gender,
-#                         breed=breed,
-#                         name=name,
-#                         rescue_id=rescue_id)
-
-#         # Converting release_date string to a datetime object
-
-#         # if released_str:
-#         #     released_at = datetime.strptime(released_str, "%d-%b-%Y")
-#         # else:
-#         #     released_at = None
-
-#         db.session.add(animal)
-
-#     db.session.commit()
-
 def load_animals():
     """Load animals from u.animal into database."""
 
@@ -101,13 +65,6 @@ def load_animals():
                         gender_id=gender_id,
                         age_id=age_id,
                         size_id=size_id)
-
-        # Converting release_date string to a datetime object
-
-        # if released_str:
-        #     released_at = datetime.strptime(released_str, "%d-%b-%Y")
-        # else:
-        #     released_at = None
 
         db.session.add(animal)
 
@@ -156,7 +113,6 @@ def load_sizes():
     for row in open('seed_data/u.size'):
         row = row.rstrip()
         size_id, size_category = row.split("|")
-
         size = Size(size_id=size_id,
                     size_category=size_category)
 
