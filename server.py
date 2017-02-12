@@ -6,7 +6,7 @@ from flask import (Flask, jsonify, render_template, redirect, request, flash,
                    session)
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import Rescue, Animal, Gender, Size, Age, connect_to_db, db
+from model import Rescue, Animal, Gender, Size, Age, Admin, connect_to_db, db
 
 
 app = Flask(__name__)
@@ -22,36 +22,38 @@ app.jinja_env.undefined = StrictUndefined
 
 @app.route('/')
 def index():
-    """Homepage."""
+    """Homepage. Displays list of rescues"""
 
     rescues = Rescue.query.all()
 
+    admin = db.session.query(Admin.admin_id).first()
+
     return render_template('homepage.html',
-                           rescues=rescues)
+                           rescues=rescues,
+                           admin=admin)
 
 
-#@app.route('/rescues/<int:rescue_id>')
+@app.route('/rescues/<int:rescue_id>')
+def load_shelter_info(rescue_id):
+    """ Displays rescue details and list of available dogs & cats """
 
-@app.route('/rescues/<rescue_name>')
-def load_shelter_info(rescue_name):
-
-    #rescue = request.args.get('rescue_id')
     rescue_info = db.session.query(Rescue.rescue_id,
                                    Rescue.name,
                                    Rescue.phone,
                                    Rescue.address,
                                    Rescue.email,
-                                   Rescue.img_url).filter(Rescue.name == rescue_name).first()
+                                   Rescue.img_url).filter(Rescue.rescue_id == rescue_id).first()
 
-    animals = Animal.query.all()
+    #animals = Animal.query.all()
+    animals = db.session.query(Animal).filter(Animal.rescue_id == rescue_id).all()
 
     return render_template('rescue_info.html',
                            rescue_info=rescue_info,
                            animals=animals)
 
 
-@app.route('/rescues/<rescue_name>/<animal_name>')
-def load_animal_info(rescue_name, animal_name):
+@app.route('/rescues/<int:rescue_id>/animals/<int:animal_id>')
+def load_animal_info(rescue_id, animal_id):
 
     animal_info = db.session.query(Animal.animal_id,
                                    Animal.img_url,
@@ -64,10 +66,43 @@ def load_animal_info(rescue_name, animal_name):
                                    Animal.size_id,
                                    Gender.gender_name,
                                    Age.age_category,
-                                   Size.size_category).join(Gender, Age, Size).filter(Animal.name == animal_name).first()
-    print '********************', animal_info
+                                   Size.size_category).join(Gender, Age, Size).filter(Animal.animal_id == animal_id).first()
+
     return render_template('animal_info.html',
                             animal_info=animal_info)
+
+
+@app.route('/admin/<int:admin_id>')
+def load_admin_page(admin_id):
+    """ Show admin page """
+
+    admin = db.session.query(Admin.admin_id,
+                             Admin.email,
+                             Admin.password,
+                             Admin.rescue_id).filter(Admin.admin_id == admin_id).first()
+
+    return render_template('admin_page.html',
+                            admin=admin)
+
+
+@app.route('/handle-add-animal', methods=['POST'])
+def add_animal_process():
+    """ Sends admin input to the database """
+
+    entered_animal_name = request.form.get("name")
+
+    # replace hard coded id with id from session
+    rescue = db.session.query(Rescue).join(Admin).filter(Admin.admin_id == 3).first()
+
+    animal_name = Animal(name=entered_animal_name, rescue=rescue)
+
+    db.session.add(animal_name)
+
+    db.session.commit()
+
+    return redirect('/')
+
+
 
 # @app.route('/users')
 # def user_list():
@@ -173,3 +208,5 @@ if __name__ == "__main__":
     DebugToolbarExtension(app)
     app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
     app.run(port=5000, host='0.0.0.0')
+
+

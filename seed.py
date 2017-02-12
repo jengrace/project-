@@ -17,7 +17,7 @@ def load_admins():
         row = row.rstrip()
         admin_id, email, password, rescue_id = row.split("|")
 
-        admin = Admin(admin_id=admin_id,
+        admin = Admin(
                       email=email,
                       password=password,
                       rescue_id=rescue_id)
@@ -57,7 +57,7 @@ def load_animals():
     for row in open("seed_data/u.animal"):
         row = row.rstrip()
         animal_id, breed, name, rescue_id, animal_type_id, gender_id, age_id, size_id = row.split("|")
-        animal = Animal(animal_id=animal_id,
+        animal = Animal(
                         breed=breed,
                         name=name,
                         rescue_id=rescue_id,
@@ -138,18 +138,30 @@ def load_animal_type():
     db.session.commit()
 
 
-def set_val_user_id():
-    """Set value for the next user_id after seeding database"""
+# def set_val_admin_id():
+#     """Set value for the next user_id after seeding database"""
 
-    # Get the Max user_id in the database
-    result = db.session.query(func.max(Admin.admin_id)).one()
-    max_id = int(result[0])
+#     # Get the Max user_id in the database
+#     result = db.session.query(func.max(Admin.admin_id)).one()
+#     max_id = int(result[0])
 
-    # Set the value for the next user_id to be max_id + 1
-    query = "SELECT setval('admins_admin_id_seq', :new_id)"
-    db.session.execute(query, {'new_id': max_id + 1})
-    db.session.commit()
+#     # Set the value for the next user_id to be max_id + 1
+#     query = "SELECT setval('admins_admin_id_seq', :new_id)"
+#     db.session.execute(query, {'new_id': max_id + 1})
+#     db.session.commit()
 
+
+# def set_val_animal_id():
+#     """Set value for the next user_id after seeding database"""
+
+#     # Get the Max user_id in the database
+#     result = db.session.query(func.max(Animal.animal_id)).one()
+#     max_id = int(result[0])
+
+#     # Set the value for the next user_id to be max_id + 1
+#     query = "SELECT setval('animals_animal_id_seq', :new_id)"
+#     db.session.execute(query, {'new_id': max_id + 1})
+#     db.session.commit()
 
 if __name__ == "__main__":
     connect_to_db(app)
@@ -169,4 +181,5 @@ if __name__ == "__main__":
     load_animals()
     load_admins()
 
-    set_val_user_id()
+    #set_val_admin_id()
+    #set_val_animal_id()

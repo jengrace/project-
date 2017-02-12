@@ -20,7 +20,7 @@ Phone: {{ rescue_info.phone }}
 {% for animal in animals %}
   {{ animal.name }}
   <br>
-  <a href = "/rescues/{{rescue_info.name}}/{{ animal.name }}">
+  <a href = "/rescues/{{rescue_info.rescue_id}}/animals/{{ animal.animal_id }}">
     <img alt="portrait" src = "{{ animal.img_url }}">
   </a>
   <br>

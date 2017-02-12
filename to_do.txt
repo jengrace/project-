@@ -16,3 +16,4 @@ timestamps of each entry
 
 back button, redirect to homepage
 
+test cases: if admin doesnt provide all animal info 

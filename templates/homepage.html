@@ -5,12 +5,16 @@
 <ul>
   {% for rescue in rescues %}
     <li>
-      <a href="/rescues/{{ rescue.name }}">
+      <a href="/rescues/{{ rescue.rescue_id }}">
         {{ rescue.name }}
       </a>
     </li>
   {% endfor %}
 </ul>
+
+<a href="/admin/{{ admin.admin_id }}">Site user login</a> 
+
+
 <!--{% with messages = get_flashed_messages() %}
   {% if messages %}
     <ul class=flashes>

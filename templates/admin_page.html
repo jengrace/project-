@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<form action='/handle-add-animal' method='POST'>
+
+  Add animal name: <input type='text' name='name'></input>
+  <input type='submit' value='Add'></input>
+
+  <br>
+  <br>
+
+</form>
+
+{% endblock %}

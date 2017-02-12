@@ -84,16 +84,16 @@ class Rescue(db.Model):
     email = db.Column(db.String(64), nullable=True)
     img_url = db.Column(db.String(300), nullable=True, default='/static/images/GPR.png')
 
-    def __repr__(self):
-        """Provide helpful representation when printed."""
+    # def __repr__(self):
+    #     """Provide helpful representation when printed."""
 
-        return "<Rescue rescue_id=%s name=%s phone=%s " + \
-               "address=%s> email=%s" % (self.rescue_id,
-                                         self.name,
-                                         self.phone,
-                                         self.address,
-                                         self.email,
-                                         self.img_url)
+    #     return "<Rescue rescue_id=%s name=%s phone=%s " + \
+    #            "address=%s> email=%s" % (self.rescue_id,
+    #                                      self.name,
+    #                                      self.phone,
+    #                                      self.address,
+    #                                      self.email,
+    #                                      self.img_url)
 
 
 class Admin(db.Model):
@@ -143,19 +143,15 @@ class Animal(db.Model):
 
     def __repr__(self):
         """Provide helpful representation when printed."""
-
-        return "<Animal animal_id=%s img_url=%s" + \
-               "breed=%s name=%s rescue_id=%s>" + \
-               "animal_type_id=%s gender_id=%s" + \
-               "age_id=%s size_id=%s" % (self.animal_id,
-                                         self.img_url,
-                                         self.breed,
-                                         self.name,
-                                         self.rescue_id,
-                                         self.animal_type_id,
-                                         self.gender_id,
-                                         self.age_id,
-                                         self.size_id)
+        return "<Animal animal_id=%s img_url=%s name=%s>" % (self.animal_id,
+                                                             self.img_url,
+                                                             #self.breed,
+                                                             self.name)
+                                                             #self.rescue_id,
+                                                             #self.animal_type_id,
+                                                             #self.gender_id,
+                                                             #self.age_id,
+                                                             #self.size_id)
 
 
 class User(db.Model):
