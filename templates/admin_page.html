@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<form action='/handle-add-animal' method='POST'>
-
+<form action='/handle-add-animal' enctype='multipart/form-data' method='POST'>
   Add animal name: <input type='text' name='name'></input>
-  <input type='submit' value='Add'></input>
 
   <br>
   <br>
-
+  
+  Upload photo: <input type='file' name='file'>
+  <br>
+  <br>
+  <input type='submit' value='Submit'>
 </form>
 
 {% endblock %}

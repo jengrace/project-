@@ -1,13 +1,12 @@
-"""Site for animal rescues to administers"""
+"""Site for animal rescues to administer"""
 
-from jinja2 import StrictUndefined
-import sqlalchemy
+import os
 from flask import (Flask, jsonify, render_template, redirect, request, flash,
-                   session)
+                   session, url_for)
 from flask_debugtoolbar import DebugToolbarExtension
-
+from jinja2 import StrictUndefined
 from model import Rescue, Animal, Gender, Size, Age, Admin, connect_to_db, db
-
+from sqlalchemy import func
 
 app = Flask(__name__)
 
@@ -33,8 +32,8 @@ def index():
                            admin=admin)
 
 
-@app.route('/rescues/<int:rescue_id>')
-def load_shelter_info(rescue_id):
+@app.route('/<int:rescue_id>')
+def load_rescue_info(rescue_id):
     """ Displays rescue details and list of available dogs & cats """
 
     rescue_info = db.session.query(Rescue.rescue_id,
@@ -44,7 +43,6 @@ def load_shelter_info(rescue_id):
                                    Rescue.email,
                                    Rescue.img_url).filter(Rescue.rescue_id == rescue_id).first()
 
-    #animals = Animal.query.all()
     animals = db.session.query(Animal).filter(Animal.rescue_id == rescue_id).all()
 
     return render_template('rescue_info.html',
@@ -52,7 +50,7 @@ def load_shelter_info(rescue_id):
                            animals=animals)
 
 
-@app.route('/rescues/<int:rescue_id>/animals/<int:animal_id>')
+@app.route('/<int:rescue_id>/<int:animal_id>')
 def load_animal_info(rescue_id, animal_id):
 
     animal_info = db.session.query(Animal.animal_id,
@@ -85,116 +83,58 @@ def load_admin_page(admin_id):
                             admin=admin)
 
 
-@app.route('/handle-add-animal', methods=['POST'])
+# For a given file, return whether it's an allowed file or not
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+# Route that will process the file upload and other form input data
+@app.route('/handle-add-animal', methods=['GET', 'POST'])
 def add_animal_process():
     """ Sends admin input to the database """
 
-    entered_animal_name = request.form.get("name")
+    admin = db.session.query(Admin.admin_id).filter(Admin.admin_id == 1).first()
+    print '***********', type(admin)
+    if request.method == 'POST':
+        # Check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect('/admin/' + str(admin.admin_id))
+        # Get the name of the uploaded file
+        uploaded_file = request.files['file']
+        # If user does not select a file, browser also
+        # submits an empty part without filename
+        if uploaded_file.filename == '':
+            flash('No selected file')
+            return redirect('/admin/' + str(admin.admin_id))
+        # Check if the file is one of the allowed types/extensions
+        if uploaded_file and allowed_file(uploaded_file.filename):
+            entered_animal_name = request.form.get("name")
+            # TODO replace hard coded id with id from session
+            rescue = db.session.query(Rescue).join(Admin).filter(Admin.admin_id == 1).first()
+            user_filename = uploaded_file.filename
+            # Store the extension of uploaded file to add to user_filename
+            extension = user_filename.rsplit('.', 1)[1].lower()
+            # Get the next animal id to add to user_filename
+            result = db.session.query(func.max(Animal.animal_id)).one()
+            next_animal_id = str(result[0] + 1)
+            # Create file name based on rescue + animal ids
+            user_filename = str(rescue.rescue_id) + '-' + next_animal_id + '.' + extension
+            # Move the file from the temporal folder to the upload folder that was set up
+            path = os.path.join(app.config['UPLOAD_FOLDER'], user_filename)
+            uploaded_file.save(path)
 
-    # replace hard coded id with id from session
-    rescue = db.session.query(Rescue).join(Admin).filter(Admin.admin_id == 3).first()
+            # Creating an instance (row) in the animals table
+            animal = Animal(name=entered_animal_name, rescue=rescue,
+                            img_url=path)
+            # Adding the animal instance to the animals table
+            db.session.add(animal)
 
-    animal_name = Animal(name=entered_animal_name, rescue=rescue)
+            db.session.commit()
 
-    db.session.add(animal_name)
+    return redirect('/' + str(rescue.rescue_id))
 
-    db.session.commit()
-
-    return redirect('/')
-
-
-
-# @app.route('/users')
-# def user_list():
-#     """Show list of users."""
-
-#     users = User.query.all()
-#     return render_template("user_list.html", users=users)
-
-
-# @app.route('/login')
-# def login_form():
-#     """Show login page."""
-
-#     return render_template("login_page.html")
-
-
-# @app.route('/handle-login', methods=['POST'])
-# def login_process():
-#     """Redirect to homepage after login."""
-
-#     # get username and pw from login form
-#     # query database for existence of username
-#     # if username exists, get matching password
-#         # compare database password to entered password
-#         # redirect to homepage
-#     # if username doesn't exist:
-#         # create account and add user (and commit to DB)
-#         # redirect to homepage
-
-#     entered_username = request.form.get("username")
-#     entered_password = request.form.get("password")
-
-#     # Using try-except because .one() will return an error if the email is not
-#     # in the database. Except statement handles adding a new user.
-
-#     try:
-#         user = db.session.query(User).filter(User.email == entered_username).one()
-#     except sqlalchemy.orm.exc.NoResultFound:
-#         user = User(email=entered_username, password=entered_password)
-#         db.session.add(user)
-#         db.session.commit()
-#         flash('Account created. Logged in as %s.' % entered_username)
-#         return redirect('/')
-
-#     if entered_password == user.password:
-#         session['current_user'] = entered_username
-#         flash('Logged in as %s' % entered_username)
-#         return redirect('/')
-#     else:
-#         flash('Incorrect username or password.')
-#         return redirect('/login')
-
-
-# @app.route('/logout')
-# def logout():
-#     session.pop('current_user', None)
-#     flash('You have been logged out')
-#     return redirect('/login')
-
-
-# @app.route('/user-info')
-# def load_user_info():
-
-#     user = request.args.get('user_id')
-#     user_info = db.session.query(User.user_id,
-#                                  User.age,
-#                                  User.zipcode,
-#                                  Rating.movie_id).join(Rating).filter(User.user_id == user).first()
-
-#     rated_movies_obj = db.session.query(Rating.rating_id,
-#                                         Rating.score,
-#                                         Movie.title).join(Movie).filter(Rating.user_id == user).all()
-
-#     return render_template('user_details.html', user_info=user_info,
-#                                                 rated_movies_obj=rated_movies_obj)
-
-
-# @app.route('/movies')
-# def movie_list():
-
-#     movies = Movie.query.order_by(Movie.title).all()
-
-#     return render_template('movies_list.html', movies=movies)
-
-
-# @app.route('/movie-info')
-# def load_movie_info():
-
-#     movie = request.args.get('movie_id')
-#     movie_info = db.session.query(Movie.title).filter(Movie.movie_id == movie).one()
-
-#     return render_template('movies_details.html', movie_info=movie_info)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
@@ -207,6 +147,12 @@ if __name__ == "__main__":
     # Use the DebugToolbar
     DebugToolbarExtension(app)
     app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+
+    # File uploads
+    UPLOAD_FOLDER = 'static/images/'
+    # These are the extensions accepting to be uploaded
+    ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+    # This is the path to the upload directory
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
     app.run(port=5000, host='0.0.0.0')
-
-

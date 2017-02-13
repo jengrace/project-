@@ -1,8 +1,8 @@
 """Utility file to seed ratings database from MovieLens data in seed_data/"""
 
-from sqlalchemy import func
+#from sqlalchemy import func
 #from datetime import datetime
-from model import Admin, Animal, Rescue, Age, Gender, Size, AnimalType, User
+from model import Admin, Animal, Rescue, Age, Gender, Size, AnimalType
 from model import connect_to_db, db
 from server import app
 
@@ -17,8 +17,7 @@ def load_admins():
         row = row.rstrip()
         admin_id, email, password, rescue_id = row.split("|")
 
-        admin = Admin(
-                      email=email,
+        admin = Admin(email=email,
                       password=password,
                       rescue_id=rescue_id)
 
@@ -38,8 +37,7 @@ def load_rescues():
         row = row.rstrip()
         rescue_id, name, phone, address, email = row.split("|")
 
-        rescue = Rescue(rescue_id=rescue_id,
-                        name=name,
+        rescue = Rescue(name=name,
                         phone=phone,
                         address=address,
                         email=email)
@@ -57,8 +55,7 @@ def load_animals():
     for row in open("seed_data/u.animal"):
         row = row.rstrip()
         animal_id, breed, name, rescue_id, animal_type_id, gender_id, age_id, size_id = row.split("|")
-        animal = Animal(
-                        breed=breed,
+        animal = Animal(breed=breed,
                         name=name,
                         rescue_id=rescue_id,
                         animal_type_id=animal_type_id,
@@ -80,8 +77,7 @@ def load_ages():
         row = row.rstrip()
         age_id, age_category = row.split("|")
 
-        age = Age(age_id=age_id,
-                  age_category=age_category)
+        age = Age(age_category=age_category)
 
         db.session.add(age)
 
@@ -97,8 +93,7 @@ def load_genders():
         row = row.rstrip()
         gender_id, gender_name = row.split("|")
 
-        gender = Gender(gender_id=gender_id,
-                        gender_name=gender_name)
+        gender = Gender(gender_name=gender_name)
 
         db.session.add(gender)
 
@@ -113,8 +108,7 @@ def load_sizes():
     for row in open('seed_data/u.size'):
         row = row.rstrip()
         size_id, size_category = row.split("|")
-        size = Size(size_id=size_id,
-                    size_category=size_category)
+        size = Size(size_category=size_category)
 
         db.session.add(size)
 
@@ -130,8 +124,7 @@ def load_animal_type():
         row = row.rstrip()
         animal_type_id, animal_type = row.split("|")
 
-        animal_type = AnimalType(animal_type_id=animal_type_id,
-                                 animal_type=animal_type)
+        animal_type = AnimalType(animal_type=animal_type)
 
         db.session.add(animal_type)
 

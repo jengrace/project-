@@ -82,18 +82,18 @@ class Rescue(db.Model):
     phone = db.Column(db.String(30), nullable=True)
     address = db.Column(db.String(200), nullable=True)
     email = db.Column(db.String(64), nullable=True)
-    img_url = db.Column(db.String(300), nullable=True, default='/static/images/GPR.png')
+    img_url = db.Column(db.String(300), nullable=True, default='static/images/GPR.png')
 
-    # def __repr__(self):
-    #     """Provide helpful representation when printed."""
+    def __repr__(self):
+        """Provide helpful representation when printed."""
 
-    #     return "<Rescue rescue_id=%s name=%s phone=%s " + \
-    #            "address=%s> email=%s" % (self.rescue_id,
-    #                                      self.name,
-    #                                      self.phone,
-    #                                      self.address,
-    #                                      self.email,
-    #                                      self.img_url)
+        return "<Rescue rescue_id=%s name=%s phone=%s " + \
+               "address=%s> email=%s img_url=%s" % (self.rescue_id,
+                                                    self.name,
+                                                    self.phone,
+                                                    self.address,
+                                                    self.email,
+                                                    self.img_url)
 
 
 class Admin(db.Model):
@@ -109,10 +109,9 @@ class Admin(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Admin admin_id=%s email=%s username=%s " + \
+        return "<Admin admin_id=%s email=%s" + \
                "password=%s rescue_id=%s>" % (self.admin_id,
                                               self.email,
-                                              self.username,
                                               self.password,
                                               self.rescue_id)
 
@@ -125,7 +124,7 @@ class Animal(db.Model):
     __tablename__ = "animals"
 
     animal_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    img_url = db.Column(db.String(300), nullable=True, default='/static/images/dog.png')
+    img_url = db.Column(db.String(300), nullable=True, default='static/images/dog.png')
     breed = db.Column(db.String(40), nullable=True)
     name = db.Column(db.String(40), nullable=True)
     rescue_id = db.Column(db.Integer, db.ForeignKey('rescues.rescue_id'), nullable=True)
