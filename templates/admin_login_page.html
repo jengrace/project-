@@ -11,16 +11,14 @@
   {% endif %}
 {% endwith %}
 
-<form action='/handle-add-animal' enctype='multipart/form-data' method='POST'>
-  Add animal name: <input type='text' name='name'></input>
+<form action='/handle-admin-login' method='POST'>
+Email: <input type='text' name='email'></input><br>
+<br>
+Password: <input type='password' name='password'></input><br>
+<br>
+<input type='submit' value='Login'></input>
 
-  <br>
-  <br>
-  
-  Upload photo: <input type='file' name='file'>
-  <br>
-  <br>
-  <input type='submit' value='Submit'>
 </form>
+
 
 {% endblock %}

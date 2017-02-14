@@ -2,7 +2,7 @@
 
 #from sqlalchemy import func
 #from datetime import datetime
-from model import Admin, Animal, Rescue, Age, Gender, Size, AnimalType
+from model import Admin, Animal, Rescue, Age, Gender, Size, Species
 from model import connect_to_db, db
 from server import app
 
@@ -54,11 +54,11 @@ def load_animals():
 
     for row in open("seed_data/u.animal"):
         row = row.rstrip()
-        animal_id, breed, name, rescue_id, animal_type_id, gender_id, age_id, size_id = row.split("|")
+        animal_id, breed, name, rescue_id, species_id, gender_id, age_id, size_id = row.split("|")
         animal = Animal(breed=breed,
                         name=name,
                         rescue_id=rescue_id,
-                        animal_type_id=animal_type_id,
+                        species_id=species_id,
                         gender_id=gender_id,
                         age_id=age_id,
                         size_id=size_id)
@@ -115,18 +115,18 @@ def load_sizes():
     db.session.commit()
 
 
-def load_animal_type():
-    """ Load animal types from u.animal_type """
+def load_species():
+    """ Load species from u.animal_type """
 
-    print "Animal Types"
+    print "Species"
 
     for row in open('seed_data/u.animal_type'):
         row = row.rstrip()
-        animal_type_id, animal_type = row.split("|")
+        species_id, species = row.split("|")
 
-        animal_type = AnimalType(animal_type=animal_type)
+        species = Species(species=species)
 
-        db.session.add(animal_type)
+        db.session.add(species)
 
     db.session.commit()
 
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     db.create_all()
 
     # Import different types of data
-    load_animal_type()
+    load_species()
     load_ages()
     load_genders()
     load_sizes()

@@ -58,7 +58,7 @@ def load_animal_info(rescue_id, animal_id):
                                    Animal.breed,
                                    Animal.name,
                                    Animal.rescue_id,
-                                   Animal.animal_type_id,
+                                   Animal.species_id,
                                    Animal.gender_id,
                                    Animal.age_id,
                                    Animal.size_id,
@@ -92,10 +92,11 @@ def allowed_file(filename):
 # Route that will process the file upload and other form input data
 @app.route('/handle-add-animal', methods=['GET', 'POST'])
 def add_animal_process():
-    """ Sends admin input to the database """
+    """ Sends admins form input to the database """
 
-    admin = db.session.query(Admin.admin_id).filter(Admin.admin_id == 1).first()
-    print '***********', type(admin)
+    #admin = db.session.query(Admin.admin_id).filter(Admin.admin_id == 1).first()
+    admin = db.session.query(Admin.admin_id).filter(Admin.email == session['current_admin']).first()
+
     if request.method == 'POST':
         # Check if the post request has the file part
         if 'file' not in request.files:
@@ -112,7 +113,8 @@ def add_animal_process():
         if uploaded_file and allowed_file(uploaded_file.filename):
             entered_animal_name = request.form.get("name")
             # TODO replace hard coded id with id from session
-            rescue = db.session.query(Rescue).join(Admin).filter(Admin.admin_id == 1).first()
+            #rescue = db.session.query(Rescue).join(Admin).filter(Admin.admin_id == 1).first()
+            rescue = db.session.query(Rescue).join(Admin).filter(Admin.email == session['current_admin']).first()
             user_filename = uploaded_file.filename
             # Store the extension of uploaded file to add to user_filename
             extension = user_filename.rsplit('.', 1)[1].lower()
@@ -134,6 +136,41 @@ def add_animal_process():
             db.session.commit()
 
     return redirect('/' + str(rescue.rescue_id))
+
+
+@app.route('/admin-login')
+def admin_login_form():
+    """ Show login page for admins only. """
+
+    return render_template("admin_login_page.html")
+
+
+@app.route('/handle-admin-login', methods=['POST'])
+def process_admin_login():
+    """ Redirect to admin page after login. """
+
+    entered_email = request.form.get("email")
+    entered_password = request.form.get("password")
+
+    try:
+        admin = db.session.query(Admin).filter(Admin.email == entered_email).one()
+    except:
+        admin = Admin(email=entered_email, password=entered_password)
+        db.session.add(admin)
+        db.session.commit()
+        ad_id = db.session.query(Admin.admin_id).filter(Admin.admin_id == admin.admin_id).one()
+        ad_id = ad_id[0]
+        flash('Account created. Logged in as %s.' % entered_email)
+        return redirect('/admin' + '/' + str(ad_id))
+    if entered_password == admin.password:
+        session['current_admin'] = entered_email
+        ad_id = db.session.query(Admin.admin_id).filter(Admin.admin_id == admin.admin_id).one()
+        ad_id = ad_id[0]
+        flash('Logged in as %s' % entered_email)
+        return redirect('/admin' + '/' + str(ad_id))
+    else:
+        flash('Incorrect username or password.')
+        return redirect('/')
 
 
 if __name__ == "__main__":

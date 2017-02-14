@@ -12,19 +12,19 @@ db = SQLAlchemy()
 ##############################################################################
 # Model definitions
 
-class AnimalType(db.Model):
+class Species(db.Model):
     """ Types of animals on rescue page """
 
-    __tablename__ = "animal_types"
+    __tablename__ = "species"
 
-    animal_type_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    animal_type = db.Column(db.String(20), nullable=True)
+    species_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    species = db.Column(db.String(20), nullable=True)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<AnimalType animal_type_id=%s animal_type=%s" % (self.animal_type_id,
-                                                                 self.animal_type)
+        return "<Species species_id=%s species=%s" % (self.species_id,
+                                                      self.species)
 
 
 class Gender(db.Model):
@@ -128,14 +128,14 @@ class Animal(db.Model):
     breed = db.Column(db.String(40), nullable=True)
     name = db.Column(db.String(40), nullable=True)
     rescue_id = db.Column(db.Integer, db.ForeignKey('rescues.rescue_id'), nullable=True)
-    animal_type_id = db.Column(db.Integer, db.ForeignKey('animal_types.animal_type_id'), nullable=True)
+    species_id = db.Column(db.Integer, db.ForeignKey('species.species_id'), nullable=True)
     gender_id = db.Column(db.Integer, db.ForeignKey('genders.gender_id'), nullable=True)
     age_id = db.Column(db.Integer, db.ForeignKey('ages.age_id'), nullable=True)
     size_id = db.Column(db.Integer, db.ForeignKey('sizes.size_id'), nullable=True)
 
     # Defining relationships
     rescue = db.relationship('Rescue', backref=db.backref("animals", order_by=animal_id))
-    animal_type = db.relationship('AnimalType', backref=db.backref("animals", order_by=animal_id))
+    species = db.relationship('Species', backref=db.backref("animals", order_by=animal_id))
     gender = db.relationship('Gender', backref=db.backref("animals", order_by=animal_id))
     age = db.relationship('Age', backref=db.backref("animals", order_by=animal_id))
     size = db.relationship('Size', backref=db.backref("animals", order_by=animal_id))

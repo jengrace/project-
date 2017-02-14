@@ -11,3 +11,6 @@ timestamps of each entry
 back button, redirect to homepage
 
 test cases: if admin doesnt provide all animal info 
+
+
+<!--<a href="/admin/{{ admin.admin_id }}">Site user login</a>-->

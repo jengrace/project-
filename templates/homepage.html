@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
 
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
 <h2> Animal Rescues </h2>
 <ul>
   {% for rescue in rescues %}
@@ -12,7 +22,8 @@
   {% endfor %}
 </ul>
 
-<a href="/admin/{{ admin.admin_id }}">Site user login</a> 
+
+<a href="/admin-login">Site user login</a>
 
 
 <!--{% with messages = get_flashed_messages() %}
