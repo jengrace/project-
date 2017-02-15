@@ -12,7 +12,7 @@
 {% endwith %}
 
 <form action='/handle-add-animal' enctype='multipart/form-data' method='POST'>
-  Add animal name: <input type='text' name='name'></input>
+  Name: <input type='text' name='name'></input>
 
   <br>
   <br>
@@ -20,7 +20,61 @@
   Upload photo: <input type='file' name='file'>
   <br>
   <br>
+
+  Gender: 
+  <select>
+    <option value="unkown">Unknown</option>
+    <option value="female">Female</option>
+    <option value="male">Male</option>
+  </select>
+
+  <br>
+  <br>
+
+  Age:
+  <select>
+    <option value="unkown">Unknown</option>
+    <option value="puppy">Puppy(0 - 9 months)</option>
+    <option value="young">Young(9 - 18 months)</option>
+    <option value="adult">Adult(18 months - 7 years)</option>
+    <option value="senior">Senior(9 - 18 months)</option>
+  </select>
+
+  <br>
+  <br>
+
+  Size:
+  <select>
+    <option value="unkown">Unknown</option>
+    <option value="toy">Toy(0 - 10 lbs)</option>
+    <option value="small">Small(10 - 25 lbs)</option>
+    <option value="medium">Medium(25 - 60 lbs)</option>
+    <option value="large">Large(60 - 100 lbs)</option>
+    <option value="extralarge">Extra Large(100+ lbs)</option>
+  </select>
+
+  <br>
+  <br>
+
+  Species:
+  <select>
+  <option value="dog">Dog</option>
+  <option value="cat">Cat</option>
+  </select>
+
+  <br>
+  <br>
   <input type='submit' value='Submit'>
+
 </form>
+
+<br>
+<br>
+
+<div>
+{% if 'current_admin' in session %}
+  <a href='/admin-logout' style=>Logout</a>
+{% endif %}
+</div>
 
 {% endblock %}

@@ -55,7 +55,7 @@ def load_animal_info(rescue_id, animal_id):
 
     animal_info = db.session.query(Animal.animal_id,
                                    Animal.img_url,
-                                   Animal.breed,
+                                   #Animal.breed,
                                    Animal.name,
                                    Animal.rescue_id,
                                    Animal.species_id,
@@ -64,7 +64,7 @@ def load_animal_info(rescue_id, animal_id):
                                    Animal.size_id,
                                    Gender.gender_name,
                                    Age.age_category,
-                                   Size.size_category).join(Gender, Age, Size).filter(Animal.animal_id == animal_id).first()
+                                   Size.size_category).join(Gender, Age, Size, Species).filter(Animal.animal_id == animal_id).first()
 
     return render_template('animal_info.html',
                             animal_info=animal_info)
@@ -79,8 +79,12 @@ def load_admin_page(admin_id):
                              Admin.password,
                              Admin.rescue_id).filter(Admin.admin_id == admin_id).first()
 
-    return render_template('admin_page.html',
-                            admin=admin)
+    # checks if a logged in admin exists and making sure that only the logged in admin only sees the admin page that belongs to them
+    if 'current_admin' not in session or admin.email != session['current_admin']:
+        return redirect('/')
+    else:
+        return render_template('admin_page.html',
+                                admin=admin)
 
 
 # For a given file, return whether it's an allowed file or not
@@ -96,7 +100,6 @@ def add_animal_process():
 
     #admin = db.session.query(Admin.admin_id).filter(Admin.admin_id == 1).first()
     admin = db.session.query(Admin.admin_id).filter(Admin.email == session['current_admin']).first()
-
     if request.method == 'POST':
         # Check if the post request has the file part
         if 'file' not in request.files:
@@ -152,16 +155,20 @@ def process_admin_login():
     entered_email = request.form.get("email")
     entered_password = request.form.get("password")
 
+    #admin = db.session.query(Admin).filter(Admin.email == entered_email).one()
+    #print '******************* admin: ', admin.email
     try:
         admin = db.session.query(Admin).filter(Admin.email == entered_email).one()
     except:
-        admin = Admin(email=entered_email, password=entered_password)
-        db.session.add(admin)
-        db.session.commit()
-        ad_id = db.session.query(Admin.admin_id).filter(Admin.admin_id == admin.admin_id).one()
-        ad_id = ad_id[0]
-        flash('Account created. Logged in as %s.' % entered_email)
-        return redirect('/admin' + '/' + str(ad_id))
+        flash('Could not locate your account. Please click on sign up to create an account!')
+        return redirect('/')
+    #     admin = Admin(email=entered_email, password=entered_password)
+    #     db.session.add(admin)
+    #     db.session.commit()
+    #     ad_id = db.session.query(Admin.admin_id).filter(Admin.admin_id == admin.admin_id).one()
+    #     ad_id = ad_id[0]
+    #     flash('Account created. Logged in as %s.' % entered_email)
+    #     return redirect('/admin' + '/' + str(ad_id))
     if entered_password == admin.password:
         session['current_admin'] = entered_email
         ad_id = db.session.query(Admin.admin_id).filter(Admin.admin_id == admin.admin_id).one()
@@ -169,9 +176,21 @@ def process_admin_login():
         flash('Logged in as %s' % entered_email)
         return redirect('/admin' + '/' + str(ad_id))
     else:
-        flash('Incorrect username or password.')
+        flash('Incorrect password. Please try logging in again.')
         return redirect('/')
 
+
+@app.route('/admin-logout')
+def admin_logout():
+    session.pop('current_admin', None)
+    flash('You have been logged out')
+    return redirect('/')
+
+
+@app.route('/admin-signup')
+def admin_signup():
+    #flash('Thanks for signing up! Will be in contact shortly!')
+    return render_template("signup_page.html")
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
