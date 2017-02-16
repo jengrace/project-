@@ -39,7 +39,7 @@ class Gender(db.Model):
         """Provide helpful representation when printed."""
 
         return "<Gender gender_id=%s gender_category=%s" % (self.gender_id,
-                                                            self.gender_category)
+                                                            self.gender_name)
 
 
 class Age(db.Model):
@@ -142,15 +142,15 @@ class Animal(db.Model):
 
     def __repr__(self):
         """Provide helpful representation when printed."""
-        return "<Animal animal_id=%s img_url=%s name=%s>" % (self.animal_id,
-                                                             self.img_url,
-                                                             #self.breed,
-                                                             self.name)
-                                                             #self.rescue_id,
-                                                             #self.animal_type_id,
-                                                             #self.gender_id,
-                                                             #self.age_id,
-                                                             #self.size_id)
+        return "<Animal animal_id=%s img_url=%s name=%s gender_id=%s>" % (self.animal_id,
+                                                                             self.img_url,
+                                                                             #self.breed,
+                                                                             self.name,
+                                                                             #self.rescue_id,
+                                                                             #self.animal_type_id,
+                                                                             self.gender_id)
+                                                                             #self.age_id,
+                                                                             #self.size_id)
 
 
 class User(db.Model):

@@ -116,11 +116,11 @@ def load_sizes():
 
 
 def load_species():
-    """ Load species from u.animal_type """
+    """ Load species from u.species """
 
     print "Species"
 
-    for row in open('seed_data/u.animal_type'):
+    for row in open('seed_data/u.species'):
         row = row.rstrip()
         species_id, species = row.split("|")
 

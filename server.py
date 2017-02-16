@@ -54,17 +54,15 @@ def load_rescue_info(rescue_id):
 def load_animal_info(rescue_id, animal_id):
 
     animal_info = db.session.query(Animal.animal_id,
-                                   Animal.img_url,
-                                   #Animal.breed,
-                                   Animal.name,
-                                   Animal.rescue_id,
-                                   Animal.species_id,
-                                   Animal.gender_id,
-                                   Animal.age_id,
-                                   Animal.size_id,
-                                   Gender.gender_name,
-                                   Age.age_category,
-                                   Size.size_category).join(Gender, Age, Size, Species).filter(Animal.animal_id == animal_id).first()
+                                    Animal.img_url,
+                                    Animal.name,
+                                    Animal.rescue_id,
+                                    Animal.gender_id,
+                                    Gender.gender_name,
+                                    Age.age_id,
+                                    Age.age_category,
+                                    Size.size_category).outerjoin(Gender, Age, Size).filter(Animal.animal_id == animal_id).first()
+    print '^^^^^^^^^^^^^^^^^^^^^^^^ animal_info: ', animal_info
 
     return render_template('animal_info.html',
                             animal_info=animal_info)
@@ -98,7 +96,6 @@ def allowed_file(filename):
 def add_animal_process():
     """ Sends admins form input to the database """
 
-    #admin = db.session.query(Admin.admin_id).filter(Admin.admin_id == 1).first()
     admin = db.session.query(Admin.admin_id).filter(Admin.email == session['current_admin']).first()
     if request.method == 'POST':
         # Check if the post request has the file part
@@ -114,9 +111,15 @@ def add_animal_process():
             return redirect('/admin/' + str(admin.admin_id))
         # Check if the file is one of the allowed types/extensions
         if uploaded_file and allowed_file(uploaded_file.filename):
-            entered_animal_name = request.form.get("name")
-            # TODO replace hard coded id with id from session
-            #rescue = db.session.query(Rescue).join(Admin).filter(Admin.admin_id == 1).first()
+            name = request.form.get("name").title()
+            gender = request.form.get("gender")
+            age = request.form.get("age")
+            size = request.form.get("size")
+            #species = request.form.get("species").title()
+
+            gender = db.session.query(Gender.gender_id).filter(Gender.gender_name == gender).first()
+            age = db.session.query(Age.age_id).filter(Age.age_category == age).first()
+            size = db.session.query(Size.size_id).filter(Size.size_category == size).first()
             rescue = db.session.query(Rescue).join(Admin).filter(Admin.email == session['current_admin']).first()
             user_filename = uploaded_file.filename
             # Store the extension of uploaded file to add to user_filename
@@ -130,10 +133,13 @@ def add_animal_process():
             path = os.path.join(app.config['UPLOAD_FOLDER'], user_filename)
             uploaded_file.save(path)
 
+
             # Creating an instance (row) in the animals table
-            animal = Animal(name=entered_animal_name, rescue=rescue,
-                            img_url=path)
+            animal = Animal(name=name, rescue=rescue, img_url=path,
+                            gender_id=gender, age_id=age, size_id=size)
+            print '&&&&&&&&&&&&&&&&&&&&&&: animal: ', animal
             # Adding the animal instance to the animals table
+
             db.session.add(animal)
 
             db.session.commit()
