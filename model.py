@@ -18,13 +18,32 @@ class Species(db.Model):
     __tablename__ = "species"
 
     species_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    species = db.Column(db.String(20), nullable=True)
+    species_type = db.Column(db.String(20), nullable=True)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Species species_id=%s species=%s" % (self.species_id,
-                                                      self.species)
+        return "<Species species_id=%s species_type=%s" % (self.species_id,
+                                                           self.species_type)
+
+
+class Breed(db.Model):
+    """ Types of breeds for the admin to choose from """
+
+    __tablename__ = "breeds"
+
+    breed_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    breed_type = db.Column(db.String(50), nullable=True)
+    species_id = db.Column(db.Integer, db.ForeignKey('species.species_id'), nullable=True)
+
+    species = db.relationship('Species', backref=db.backref("breeds", order_by=breed_id))
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Species breed_id=%s breed_type=%s species_id=%s" % (self.breed_id,
+                                                                     self.breed_type,
+                                                                     self.species_id)
 
 
 class Gender(db.Model):
@@ -33,13 +52,13 @@ class Gender(db.Model):
     __tablename__ = "genders"
 
     gender_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    gender_name = db.Column(db.String(20), nullable=True)
+    gender_type = db.Column(db.String(20), nullable=True)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
         return "<Gender gender_id=%s gender_category=%s" % (self.gender_id,
-                                                            self.gender_name)
+                                                            self.gender_type)
 
 
 class Age(db.Model):
@@ -125,62 +144,64 @@ class Animal(db.Model):
 
     animal_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     img_url = db.Column(db.String(300), nullable=True, default='static/images/dog.png')
-    breed = db.Column(db.String(40), nullable=True)
+    #breed = db.Column(db.String(40), nullable=True)
     name = db.Column(db.String(40), nullable=True)
+    bio = db.Column(db.Text, nullable=True, default='Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi iaculis pretium lorem nec commodo. Etiam auctor, lectus a ultricies interdum, sapien massa commodo velit, quis egestas dolor mi sed neque.')
+    is_adopted = db.Column(db.Boolean, nullable=True, default=False)  # will be a True or False
+    is_visible = db.Column(db.Boolean, nullable=True, default=True)  # will be a True or False
     rescue_id = db.Column(db.Integer, db.ForeignKey('rescues.rescue_id'), nullable=True)
-    species_id = db.Column(db.Integer, db.ForeignKey('species.species_id'), nullable=True)
+    #species_id = db.Column(db.Integer, db.ForeignKey('species.species_id'), nullable=True)
     gender_id = db.Column(db.Integer, db.ForeignKey('genders.gender_id'), nullable=True)
     age_id = db.Column(db.Integer, db.ForeignKey('ages.age_id'), nullable=True)
     size_id = db.Column(db.Integer, db.ForeignKey('sizes.size_id'), nullable=True)
+    breed_id = db.Column(db.Integer, db.ForeignKey('breeds.breed_id'), nullable=True)
 
     # Defining relationships
+    # point to the Rescue class and load multiple of those. backref is a simple way to declare a new property on the Rescue class
     rescue = db.relationship('Rescue', backref=db.backref("animals", order_by=animal_id))
-    species = db.relationship('Species', backref=db.backref("animals", order_by=animal_id))
+    #species = db.relationship('Species', backref=db.backref("animals", order_by=animal_id))
     gender = db.relationship('Gender', backref=db.backref("animals", order_by=animal_id))
     age = db.relationship('Age', backref=db.backref("animals", order_by=animal_id))
     size = db.relationship('Size', backref=db.backref("animals", order_by=animal_id))
+    breed = db.relationship('Breed', backref=db.backref("animals", order_by=animal_id))
 
     def __repr__(self):
         """Provide helpful representation when printed."""
-        return "<Animal animal_id=%s img_url=%s name=%s gender_id=%s>" % (self.animal_id,
-                                                                             self.img_url,
-                                                                             #self.breed,
-                                                                             self.name,
-                                                                             #self.rescue_id,
-                                                                             #self.animal_type_id,
-                                                                             self.gender_id)
-                                                                             #self.age_id,
-                                                                             #self.size_id)
+        return "<Animal animal_id=%s img_url=%s name=%s gender_id=%s breed_id=%s>" % (self.animal_id,
+                                                                                      self.img_url,
+                                                                                      self.name,
+                                                                                      self.gender_id,
+                                                                                      self.breed_id)
 
 
-class User(db.Model):
-    """ User of rescue site """
+# class User(db.Model):
+#     """ User of rescue site """
 
-    __tablename__ = "users"
+#     __tablename__ = "users"
 
-    user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    email = db.Column(db.String(64), nullable=True)
-    password = db.Column(db.String(64), nullable=True)
-    zipcode = db.Column(db.String(15), nullable=True)
+#     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+#     email = db.Column(db.String(64), nullable=True)
+#     password = db.Column(db.String(64), nullable=True)
+#     zipcode = db.Column(db.String(15), nullable=True)
 
-    def __repr__(self):
-        """Provide helpful representation when printed."""
+#     def __repr__(self):
+#         """Provide helpful representation when printed."""
 
-        return "<User user_id=%s email=%s password=%s " + \
-               "zipcode=%s>" % (self.user_id,
-                                self.email,
-                                self.password,
-                                self.zipcode)
+#         return "<User user_id=%s email=%s password=%s " + \
+#                "zipcode=%s>" % (self.user_id,
+#                                 self.email,
+#                                 self.password,
+#                                 self.zipcode)
 
 
-class RescueUser(db.Model):
-    """ Ratings on ratings website. """
+# class RescueUser(db.Model):
+#     """ Ratings on ratings website. """
 
-    __tablename__ = "rescue_users"
+#     __tablename__ = "rescue_users"
 
-    su_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    rescue_id = db.Column(db.Integer, db.ForeignKey('rescues.rescue_id'), nullable=False)
+#     su_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+#     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+#     rescue_id = db.Column(db.Integer, db.ForeignKey('rescues.rescue_id'), nullable=False)
 
     # Defining relationships with other tables:
     #user = db.relationship("User", backref=db.backref("shelter_users"))

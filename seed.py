@@ -2,7 +2,7 @@
 
 #from sqlalchemy import func
 #from datetime import datetime
-from model import Admin, Animal, Rescue, Age, Gender, Size, Species
+from model import Admin, Animal, Rescue, Age, Gender, Size, Species, Breed
 from model import connect_to_db, db
 from server import app
 
@@ -54,14 +54,13 @@ def load_animals():
 
     for row in open("seed_data/u.animal"):
         row = row.rstrip()
-        animal_id, breed, name, rescue_id, species_id, gender_id, age_id, size_id = row.split("|")
-        animal = Animal(breed=breed,
-                        name=name,
+        animal_id, name, rescue_id, gender_id, age_id, size_id, breed_id = row.split("|")
+        animal = Animal(name=name,
                         rescue_id=rescue_id,
-                        species_id=species_id,
                         gender_id=gender_id,
                         age_id=age_id,
-                        size_id=size_id)
+                        size_id=size_id,
+                        breed_id=breed_id)
 
         db.session.add(animal)
 
@@ -91,9 +90,9 @@ def load_genders():
 
     for row in open('seed_data/u.gender'):
         row = row.rstrip()
-        gender_id, gender_name = row.split("|")
+        gender_id, gender_type = row.split("|")
 
-        gender = Gender(gender_name=gender_name)
+        gender = Gender(gender_type=gender_type)
 
         db.session.add(gender)
 
@@ -122,11 +121,27 @@ def load_species():
 
     for row in open('seed_data/u.species'):
         row = row.rstrip()
-        species_id, species = row.split("|")
+        species_id, species_type = row.split("|")
 
-        species = Species(species=species)
+        species = Species(species_type=species_type)
 
         db.session.add(species)
+
+    db.session.commit()
+
+
+def load_breeds():
+    """ Load breeds from u.breeds """
+
+    print "Breeds"
+
+    for row in open('seed_data/u.breeds'):
+        row = row.rstrip()
+        breed_id, breed_type, species_id = row.split("|")
+
+        breed = Breed(breed_type=breed_type, species_id=species_id)
+
+        db.session.add(breed)
 
     db.session.commit()
 
@@ -167,6 +182,7 @@ if __name__ == "__main__":
 
     # Import different types of data
     load_species()
+    load_breeds()
     load_ages()
     load_genders()
     load_sizes()

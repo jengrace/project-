@@ -11,6 +11,8 @@
   {% endif %}
 {% endwith %}
 
+<hr>
+
 <form action='/handle-add-animal' enctype='multipart/form-data' method='POST'>
   Name: <input type='text' name='name'></input>
 
@@ -23,7 +25,7 @@
 
   Gender: 
   <select name="gender">
-    <option value="Unkown">Unknown</option>
+    <option value="Unknown">Unknown</option>
     <option value="Female">Female</option>
     <option value="Male">Male</option>
   </select>
@@ -33,7 +35,7 @@
 
   Age:
   <select name="age">
-    <option value="Unkown">Unknown</option>
+    <option value="Unknown">Unknown</option>
     <option value="Puppy (0 - 9 months)">Puppy (0 - 9 months)</option>
     <option value="Young (9 - 18 months)">Young (9 - 18 months)</option>
     <option value="Adult (18 months - 7 years)">Adult (18 months - 7 years)</option>
@@ -45,7 +47,7 @@
 
   Size:
   <select name="size">
-    <option value="Unkown">Unknown</option>
+    <option value="Unknown">Unknown</option>
     <option value="Toy (0 - 10 lbs)">Toy (0 - 10 lbs)</option>
     <option value="Small (10 - 25 lbs)">Small (10 - 25 lbs)</option>
     <option value="Medium (25 - 60 lbs)">Medium (25 - 60 lbs)</option>
@@ -55,18 +57,48 @@
 
   <br>
   <br>
-<!--
-  Species:
-  <select name="species">
-    <option value="Dog">Dog</option>
-    <option value="Cat">Cat</option>
+
+  Breed:
+  <select name="breeds">
+    <option value="Mixed Breed">Mixed Breed</option>
+    <option value="Golden Retriever">Golden Retriever</option>
+    <option value="Chihuahua">Chihuahua</option>
+    <option value="German Shepherd">German Shepherd</option>
+    <option value="Labrador Retriever">Labrador Retriever</option>
   </select>
 
   <br>
   <br>
-  -->
+
+  Bio:
+  <textarea placeholder="Type bio here (max: 300)" name='bio' maxlength="300" rows="5" cols="40"></textarea>
+
+  <br>
+  <br>
+
+  Adopted? Please update to Yes when adopted!
+  <select name="is_adopted">
+    <option value="f">No</option>
+    <option value="t">Yes</option>
+  </select>
+
+  <br>
+  <br>
+
+  Visible to page? Please update to No if you don't want to currently display this animal on your page!
+  <select name="is_visible">
+    <option value="t">Yes</option>
+    <option value="f">No</option>
+  </select>
+
+
+  <br>
+  <br>
+  
   <input type='submit' value='Submit'>
 </form>
+
+
 
 <br>
 <br>

@@ -5,7 +5,7 @@ from flask import (Flask, jsonify, render_template, redirect, request, flash,
                    session, url_for)
 from flask_debugtoolbar import DebugToolbarExtension
 from jinja2 import StrictUndefined
-from model import Rescue, Animal, Gender, Size, Age, Admin, connect_to_db, db
+from model import Rescue, Animal, Gender, Size, Age, Admin, Breed, connect_to_db, db
 from sqlalchemy import func
 
 app = Flask(__name__)
@@ -58,10 +58,12 @@ def load_animal_info(rescue_id, animal_id):
                                     Animal.name,
                                     Animal.rescue_id,
                                     Animal.gender_id,
-                                    Gender.gender_name,
+                                    Animal.bio,
+                                    Gender.gender_type,
                                     Age.age_id,
                                     Age.age_category,
-                                    Size.size_category).outerjoin(Gender, Age, Size).filter(Animal.animal_id == animal_id).first()
+                                    Size.size_category,
+                                    Breed.breed_type).outerjoin(Gender, Age, Size, Breed).filter(Animal.animal_id == animal_id).first()
     print '^^^^^^^^^^^^^^^^^^^^^^^^ animal_info: ', animal_info
 
     return render_template('animal_info.html',
@@ -115,11 +117,17 @@ def add_animal_process():
             gender = request.form.get("gender")
             age = request.form.get("age")
             size = request.form.get("size")
+            breed = request.form.get("breeds")
+            bio = request.form.get("bio")
+            is_adopted = request.form.get("is_adopted")
+            is_visible = request.form.get("is_visible")
             #species = request.form.get("species").title()
 
-            gender = db.session.query(Gender.gender_id).filter(Gender.gender_name == gender).first()
+            gender = db.session.query(Gender.gender_id).filter(Gender.gender_type == gender).first()
             age = db.session.query(Age.age_id).filter(Age.age_category == age).first()
             size = db.session.query(Size.size_id).filter(Size.size_category == size).first()
+            breed = db.session.query(Breed.breed_id).filter(Breed.breed_type == breed).first()
+
             rescue = db.session.query(Rescue).join(Admin).filter(Admin.email == session['current_admin']).first()
             user_filename = uploaded_file.filename
             # Store the extension of uploaded file to add to user_filename
@@ -136,7 +144,9 @@ def add_animal_process():
 
             # Creating an instance (row) in the animals table
             animal = Animal(name=name, rescue=rescue, img_url=path,
-                            gender_id=gender, age_id=age, size_id=size)
+                            gender_id=gender, age_id=age, size_id=size,
+                            breed_id=breed, bio=bio, is_adopted=is_adopted,
+                            is_visible=is_visible)
             print '&&&&&&&&&&&&&&&&&&&&&&: animal: ', animal
             # Adding the animal instance to the animals table
 
