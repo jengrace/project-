@@ -125,14 +125,14 @@ class Admin(db.Model):
     password = db.Column(db.String(64), nullable=True)
     rescue_id = db.Column(db.Integer, db.ForeignKey('rescues.rescue_id'), nullable=True)  # just a number, not an object!
 
-    def __repr__(self):
-        """Provide helpful representation when printed."""
+    # def __repr__(self):
+    #     """Provide helpful representation when printed."""
 
-        return "<Admin admin_id=%s email=%s" + \
-               "password=%s rescue_id=%s>" % (self.admin_id,
-                                              self.email,
-                                              self.password,
-                                              self.rescue_id)
+    #     return "<Admin admin_id=%s email=%s" + \
+    #            "password=%s rescue_id=%s>" % (self.admin_id,
+    #                                           self.email,
+    #                                           self.password,
+    #                                           self.rescue_id)
 
     rescue = db.relationship('Rescue', backref=db.backref("admins", order_by=admin_id))
 
