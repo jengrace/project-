@@ -12,6 +12,8 @@ back button, redirect to homepage
 
 test cases: if admin doesnt provide all animal info 
 
+breed.species.species_type
+
 
 
 
