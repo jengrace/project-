@@ -4,7 +4,7 @@
 <h2> {{ rescue_info.name }} </h2>
 <br>
 <br>
-<img src= "{{ rescue_info.img_url }}" alt="GPR" style="">
+<img src= "/{{ rescue_info.img_url }}" alt="GPR" style="">
 <br>
 <br>
 Address: {{ rescue_info.address }}
@@ -19,8 +19,8 @@ Phone: {{ rescue_info.phone }}
 {% for animal in animals %}
   {{ animal.name }}
   <br>
-  <a href = "/{{rescue_info.rescue_id}}/{{ animal.animal_id }}">
-    <img alt="portrait" src = "{{ animal.img_url }}">
+  <a href = "/rescue/{{rescue_info.rescue_id}}/animal/{{ animal.animal_id }}">
+    <img alt="portrait" src = "/{{ animal.img_url }}">
   </a>
   <br>
 {% endfor %}

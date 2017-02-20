@@ -1,9 +1,0 @@
-<!-- Add image of animal inside of a link, link leads to animal's info -->
-<h2> Dogs: </h2>
-{% for animal in rescue.animals %}
-  {{ animal.name }}
-  <br>
-  <a href = "/rescues/{{ rescue.rescue_id }}/animals/{{ animal.name }}">
-    <img alt="portrait" src = "{{ animal.img_url }}">
-  </a>
-  <br>

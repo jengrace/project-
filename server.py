@@ -8,6 +8,13 @@ from jinja2 import StrictUndefined
 from model import Rescue, Animal, Gender, Size, Age, Admin, Breed, connect_to_db, db
 from sqlalchemy import func
 
+# from db_updater import *
+# add_animal()
+
+# import db_updater as db
+# db.add_animal()
+
+
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
@@ -31,8 +38,8 @@ def index():
                            rescues=rescues,
                            admin=admin)
 
-
-@app.route('/<int:rescue_id>')
+@app.route('/rescue/<int:rescue_id>')
+#@app.route('/<int:rescue_id>')
 def load_rescue_info(rescue_id):
     """ Displays rescue details and list of available dogs & cats """
 
@@ -49,8 +56,8 @@ def load_rescue_info(rescue_id):
                            rescue_info=rescue_info,
                            animals=animals)
 
-
-@app.route('/<int:rescue_id>/<int:animal_id>')
+@app.route('/rescue/<int:rescue_id>/animal/<int:animal_id>')
+#@app.route('/<int:rescue_id>/<int:animal_id>')
 def load_animal_info(rescue_id, animal_id):
 
     animal_info = db.session.query(Animal.animal_id,
@@ -85,7 +92,8 @@ def load_admin_page(admin_id):
         return render_template('admin_page.html',
                                 admin=admin)
 
-@app.route('/admin/rescue-info/<int:admin_id>')
+@app.route('/admin/<int:admin_id>/rescue-info')
+# @app.route('/admin/rescue-info/<int:admin_id>')
 def load_rescue_info_admin_page(admin_id):
     """ Show admin page """
 
@@ -112,7 +120,7 @@ def allowed_file(filename):
 @app.route('/handle-add-animal', methods=['GET', 'POST'])
 def add_animal_process():
     """ Sends admins form input to the database """
-
+    # put this ina function that receives the email as the input
     admin = db.session.query(Admin.admin_id).filter(Admin.email == session['current_admin']).first()
 
     if request.method == 'POST':
@@ -131,6 +139,7 @@ def add_animal_process():
             return redirect('/admin/' + str(admin.admin_id))
 
         # Check if the file is one of the allowed types/extensions
+        # function that receives the request as an input and function will extract info and insert into  db
         if uploaded_file and allowed_file(uploaded_file.filename):
             name = request.form.get("name").title()
             gender = request.form.get("gender")
@@ -176,7 +185,7 @@ def add_animal_process():
 
             db.session.commit()
 
-    return redirect('/' + str(rescue.rescue_id))
+    return redirect('/rescue/' + str(rescue.rescue_id))
 
 
 @app.route('/handle-add-rescue', methods=['GET', 'POST'])
@@ -293,8 +302,10 @@ def process_admin_login():
         flash('Logged in as %s' % entered_email)
 
         if admin.rescue_id is None:
-            return redirect('/admin' + '/rescue-info' + '/' + str(ad_id))
+            #return redirect('/admin' + '/rescue-info' + '/' + str(ad_id))
+            return redirect('/admin' + '/' + str(ad_id) + '/rescue-info')
         else:
+            # return to add animal page
             return redirect('/admin' + '/' + str(ad_id))
     else:
         flash('Incorrect password. Please try logging in again.')
