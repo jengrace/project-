@@ -75,23 +75,20 @@ def load_admin_page(admin_id):
     else:
         return render_template('admin_page.html', admin=admin, title=title)
 
+
 @app.route('/admin/<int:admin_id>/rescue-info')
 def load_rescue_info_admin_page(admin_id):
     """ Show admin page to add a rescue """
 
     title = 'Dashboard'
 
-    admin = db.session.query(Admin.admin_id,
-                             Admin.email,
-                             Admin.password,
-                             Admin.rescue_id).filter(Admin.admin_id == admin_id).first()
+    admin = c.get_admin(admin_id)
 
     # checks if a logged in admin exists and making sure that only the logged in admin only sees the admin page that belongs to them
     if 'current_admin' not in session or admin.email != session['current_admin']:
         return redirect('/')
     else:
-        return render_template('rescue_info_admin.html',
-                                admin=admin,
+        return render_template('rescue_info_admin.html', admin=admin,
                                 title=title)
 
 
@@ -105,14 +102,16 @@ def allowed_file(filename):
 @app.route('/handle-add-animal', methods=['GET', 'POST'])
 def add_animal_process():
     """ Sends admins form input to the database """
-    # put this ina function that receives the email as the input
-    admin = db.session.query(Admin.admin_id).filter(Admin.email == session['current_admin']).first()
-    #title = 'Add Animal'
+
+    email = session['current_admin']
+
+    admin_id = c.get_admin_by_session(email)
+
     if request.method == 'POST':
         # Check if the post request has the file part
         if 'file' not in request.files:
             flash('No file part')
-            return redirect('/admin/' + str(admin.admin_id))
+            return redirect('/admin/' + str(admin_id))
 
         # Get the name of the uploaded file
         uploaded_file = request.files['file']
@@ -121,54 +120,12 @@ def add_animal_process():
         # submits an empty part without filename
         if uploaded_file.filename == '':
             flash('No selected file')
-            return redirect('/admin/' + str(admin.admin_id))
+            return redirect('/admin/' + str(admin_id))
 
         # Check if the file is one of the allowed types/extensions
         # function that receives the request as an input and function will extract info and insert into  db
         if uploaded_file and allowed_file(uploaded_file.filename):
-            name = request.form.get("name").title()
-            gender = request.form.get("gender")
-            age = request.form.get("age")
-            size = request.form.get("size")
-            breed = request.form.get("breeds")
-            bio = request.form.get("bio")
-            is_adopted = request.form.get("is_adopted")
-            is_visible = request.form.get("is_visible")
-            #species = request.form.get("species").title()
-
-            gender = db.session.query(Gender.gender_id).filter(Gender.gender_type == gender).first()
-            age = db.session.query(Age.age_id).filter(Age.age_category == age).first()
-            size = db.session.query(Size.size_id).filter(Size.size_category == size).first()
-            breed = db.session.query(Breed.breed_id).filter(Breed.breed_type == breed).first()
-
-            rescue = db.session.query(Rescue).join(Admin).filter(Admin.email == session['current_admin']).first()
-
-            user_filename = uploaded_file.filename
-
-            # Store the extension of uploaded file to add to user_filename
-            extension = user_filename.rsplit('.', 1)[1].lower()
-
-            animal = Animal(name=name, rescue=rescue,
-                            gender_id=gender, age_id=age, size_id=size,
-                            breed_id=breed, bio=bio, is_adopted=is_adopted,
-                            is_visible=is_visible)
-
-            # Adding the animal instance to the animals table
-            db.session.add(animal)
-
-            db.session.commit()
-
-            a_id = animal.animal_id
-
-            user_filename = str(rescue.rescue_id) + '-' + str(a_id) + '.' + extension
-
-            path = os.path.join(app.config['UPLOAD_FOLDER'], user_filename)
-
-            uploaded_file.save(path)
-
-            animal.img_url = path
-
-            db.session.commit()
+            rescue = c.add_animal(request, session, uploaded_file, app.config['UPLOAD_FOLDER'])
 
     return redirect('/rescue/' + str(rescue.rescue_id))
 
