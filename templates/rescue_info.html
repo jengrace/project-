@@ -15,8 +15,8 @@ Email: {{ rescue_info.email}}
 <br>
 Phone: {{ rescue_info.phone }}
 
-<h2> Dogs: </h2>
-{% for animal in animals %}
+<h2> Adopt an Animal: </h2>
+{% for animal in available_animals %}
   {{ animal.name }}
   <br>
   <a href = "/rescue/{{rescue_info.rescue_id}}/animal/{{ animal.animal_id }}">

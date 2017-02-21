@@ -106,13 +106,8 @@ class Rescue(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Rescue rescue_id=%s name=%s phone=%s " + \
-               "address=%s> email=%s img_url=%s" % (self.rescue_id,
-                                                    self.name,
-                                                    self.phone,
-                                                    self.address,
-                                                    self.email,
-                                                    self.img_url)
+        return "<Rescue rescue_id=%s name=%s phone=%s " % (self.rescue_id,
+                                                           self.name)
 
 
 class Admin(db.Model):
@@ -125,14 +120,11 @@ class Admin(db.Model):
     password = db.Column(db.String(64), nullable=True)
     rescue_id = db.Column(db.Integer, db.ForeignKey('rescues.rescue_id'), nullable=True)  # just a number, not an object!
 
-    # def __repr__(self):
-    #     """Provide helpful representation when printed."""
+    def __repr__(self):
+        """Provide helpful representation when printed."""
 
-    #     return "<Admin admin_id=%s email=%s" + \
-    #            "password=%s rescue_id=%s>" % (self.admin_id,
-    #                                           self.email,
-    #                                           self.password,
-    #                                           self.rescue_id)
+        return "<Admin admin_id=%s rescue_id=%s>" % (self.admin_id,
+                                                     self.rescue_id)
 
     rescue = db.relationship('Rescue', backref=db.backref("admins", order_by=admin_id))
 
@@ -144,13 +136,11 @@ class Animal(db.Model):
 
     animal_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     img_url = db.Column(db.String(300), nullable=True, default='static/images/dog.png')
-    #breed = db.Column(db.String(40), nullable=True)
     name = db.Column(db.String(40), nullable=True)
     bio = db.Column(db.Text, nullable=True, default='Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi iaculis pretium lorem nec commodo. Etiam auctor, lectus a ultricies interdum, sapien massa commodo velit, quis egestas dolor mi sed neque.')
     is_adopted = db.Column(db.Boolean, nullable=True, default=False)  # will be a True or False
     is_visible = db.Column(db.Boolean, nullable=True, default=True)  # will be a True or False
     rescue_id = db.Column(db.Integer, db.ForeignKey('rescues.rescue_id'), nullable=True)
-    #species_id = db.Column(db.Integer, db.ForeignKey('species.species_id'), nullable=True)
     gender_id = db.Column(db.Integer, db.ForeignKey('genders.gender_id'), nullable=True)
     age_id = db.Column(db.Integer, db.ForeignKey('ages.age_id'), nullable=True)
     size_id = db.Column(db.Integer, db.ForeignKey('sizes.size_id'), nullable=True)
@@ -159,7 +149,6 @@ class Animal(db.Model):
     # Defining relationships
     # point to the Rescue class and load multiple of those. backref is a simple way to declare a new property on the Rescue class
     rescue = db.relationship('Rescue', backref=db.backref("animals", order_by=animal_id))
-    #species = db.relationship('Species', backref=db.backref("animals", order_by=animal_id))
     gender = db.relationship('Gender', backref=db.backref("animals", order_by=animal_id))
     age = db.relationship('Age', backref=db.backref("animals", order_by=animal_id))
     size = db.relationship('Size', backref=db.backref("animals", order_by=animal_id))
@@ -167,64 +156,8 @@ class Animal(db.Model):
 
     def __repr__(self):
         """Provide helpful representation when printed."""
-        return "<Animal animal_id=%s img_url=%s name=%s gender_id=%s breed_id=%s>" % (self.animal_id,
-                                                                                      self.img_url,
-                                                                                      self.name,
-                                                                                      self.gender_id,
-                                                                                      self.breed_id)
-
-
-# class User(db.Model):
-#     """ User of rescue site """
-
-#     __tablename__ = "users"
-
-#     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-#     email = db.Column(db.String(64), nullable=True)
-#     password = db.Column(db.String(64), nullable=True)
-#     zipcode = db.Column(db.String(15), nullable=True)
-
-#     def __repr__(self):
-#         """Provide helpful representation when printed."""
-
-#         return "<User user_id=%s email=%s password=%s " + \
-#                "zipcode=%s>" % (self.user_id,
-#                                 self.email,
-#                                 self.password,
-#                                 self.zipcode)
-
-
-# class RescueUser(db.Model):
-#     """ Ratings on ratings website. """
-
-#     __tablename__ = "rescue_users"
-
-#     su_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-#     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-#     rescue_id = db.Column(db.Integer, db.ForeignKey('rescues.rescue_id'), nullable=False)
-
-    # Defining relationships with other tables:
-    #user = db.relationship("User", backref=db.backref("shelter_users"))
-    #shelter = db.relationship("Shelter", backref=db.backref("shelter_users"))
-
-
-    # def __repr__(self):
-    #     """Provide helpful representation when printed."""
-
-    #     return "<Rating rating_id=%s movie_id=%s user_id=%s>" % (
-    #                                                             self.rating_id,
-    #                                                             self.movie_id,
-    #                                                             self.user_id)
-
-# class Transaction(db.Model):
-#     """ Redirecting users to PayPal to allow donations for rescues """
-
-#     trans_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-#     amount = db.Column(db.Integet, nullable=False)
-#     pay_pal_token =
-#     user_id = 
-#     shelter_id = 
-#     donated_at = db.Column(db.DateTime, nullable=False)
+        return "<Animal animal_id=%s name=%s>" % (self.animal_id,
+                                                  self.name)
 
 ##############################################################################
 # Helper functions

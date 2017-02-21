@@ -8,12 +8,7 @@ from jinja2 import StrictUndefined
 from model import Rescue, Animal, Gender, Size, Age, Admin, Breed, connect_to_db, db
 from sqlalchemy import func
 
-# from db_updater import *
-# add_animal()
-
-# import db_updater as db
-# db.add_animal()
-
+import control as c
 
 app = Flask(__name__)
 
@@ -30,72 +25,61 @@ app.jinja_env.undefined = StrictUndefined
 def index():
     """Homepage. Displays list of rescues"""
 
-    rescues = Rescue.query.all()
+    title = 'My page'
 
-    admin = db.session.query(Admin.admin_id).first()
+    rescues = Rescue.query.all()
 
     return render_template('homepage.html',
                            rescues=rescues,
-                           admin=admin)
+                           title=title)
+
 
 @app.route('/rescue/<int:rescue_id>')
-#@app.route('/<int:rescue_id>')
 def load_rescue_info(rescue_id):
     """ Displays rescue details and list of available dogs & cats """
 
-    rescue_info = db.session.query(Rescue.rescue_id,
-                                   Rescue.name,
-                                   Rescue.phone,
-                                   Rescue.address,
-                                   Rescue.email,
-                                   Rescue.img_url).filter(Rescue.rescue_id == rescue_id).first()
+    rescue_info = c.get_rescue(rescue_id)
 
-    animals = db.session.query(Animal).filter(Animal.rescue_id == rescue_id, Animal.is_adopted == 'f', Animal.is_visible == 't').all()
+    title = rescue_info.name
+
+    available_animals = c.get_available_animals(rescue_id)
 
     return render_template('rescue_info.html',
                            rescue_info=rescue_info,
-                           animals=animals)
+                           available_animals=available_animals,
+                           title=title)
 
 @app.route('/rescue/<int:rescue_id>/animal/<int:animal_id>')
-#@app.route('/<int:rescue_id>/<int:animal_id>')
 def load_animal_info(rescue_id, animal_id):
+    """ Displays details of each animal """
 
-    animal_info = db.session.query(Animal.animal_id,
-                                    Animal.img_url,
-                                    Animal.name,
-                                    Animal.rescue_id,
-                                    Animal.gender_id,
-                                    Animal.bio,
-                                    Gender.gender_type,
-                                    Age.age_id,
-                                    Age.age_category,
-                                    Size.size_category,
-                                    Breed.breed_type).outerjoin(Gender, Age, Size, Breed).filter(Animal.animal_id == animal_id).first()
+    animal_info = c.get_animal(animal_id)
 
-    return render_template('animal_info.html',
-                            animal_info=animal_info)
+    title = animal_info.name
+
+    return render_template('animal_info.html', animal_info=animal_info,
+                            title=title)
 
 
 @app.route('/admin/<int:admin_id>')
 def load_admin_page(admin_id):
-    """ Show admin page """
+    """ Show admin page to add animals """
 
-    admin = db.session.query(Admin.admin_id,
-                             Admin.email,
-                             Admin.password,
-                             Admin.rescue_id).filter(Admin.admin_id == admin_id).first()
+    title = 'Dashboard'
+
+    admin = c.get_admin(admin_id)
 
     # checks if a logged in admin exists and making sure that only the logged in admin only sees the admin page that belongs to them
     if 'current_admin' not in session or admin.email != session['current_admin']:
         return redirect('/')
     else:
-        return render_template('admin_page.html',
-                                admin=admin)
+        return render_template('admin_page.html', admin=admin, title=title)
 
 @app.route('/admin/<int:admin_id>/rescue-info')
-# @app.route('/admin/rescue-info/<int:admin_id>')
 def load_rescue_info_admin_page(admin_id):
-    """ Show admin page """
+    """ Show admin page to add a rescue """
+
+    title = 'Dashboard'
 
     admin = db.session.query(Admin.admin_id,
                              Admin.email,
@@ -107,7 +91,8 @@ def load_rescue_info_admin_page(admin_id):
         return redirect('/')
     else:
         return render_template('rescue_info_admin.html',
-                                admin=admin)
+                                admin=admin,
+                                title=title)
 
 
 # For a given file, return whether it's an allowed file or not
@@ -122,7 +107,7 @@ def add_animal_process():
     """ Sends admins form input to the database """
     # put this ina function that receives the email as the input
     admin = db.session.query(Admin.admin_id).filter(Admin.email == session['current_admin']).first()
-
+    #title = 'Add Animal'
     if request.method == 'POST':
         # Check if the post request has the file part
         if 'file' not in request.files:
@@ -257,7 +242,7 @@ def add_rescue_process():
 @app.route('/success')
 def add_rescue_success():
     """ Show login page for admins only. """
-
+    title = 'Success'
     last_rescue_added = db.session.query(func.max(Rescue.rescue_id)).one()
     last_rescue_added = last_rescue_added[0]
 
@@ -271,7 +256,8 @@ def add_rescue_success():
         return render_template("success_rescue_add.html",
                                last_rescue_added=last_rescue_added,
                                last_admin_added=last_admin_added,
-                               rescue_name=rescue_name)
+                               rescue_name=rescue_name,
+                               title=title)
     else:
         return redirect('/')
 
@@ -279,8 +265,9 @@ def add_rescue_success():
 @app.route('/admin-login')
 def admin_login_form():
     """ Show login page for admins only. """
-
-    return render_template("admin_login_page.html")
+    title = 'Login'
+    return render_template("admin_login_page.html",
+                            title=title)
 
 
 @app.route('/handle-admin-login', methods=['POST'])
@@ -321,8 +308,9 @@ def admin_logout():
 
 @app.route('/admin-signup')
 def admin_signup():
-    #flash('Thanks for signing up! Will be in contact shortly!')
-    return render_template("signup_page.html")
+    title = 'Sign up'
+    return render_template("signup_page.html",
+                            title=title)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
