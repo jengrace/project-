@@ -157,6 +157,22 @@ class Animal(db.Model):
         return '<Animal animal_id=%s name=%s>' % (self.animal_id,
                                                   self.name)
 
+# def example_data():
+#     """Create some sample data."""
+
+#     admin = Admin(dept_code='fin', dept='Finance', phone='555-1000')
+#     rescue = Rescue(dept_code='legal', dept='Legal', phone='555-2222')
+#     animal = Animal(dept_code='mktg', dept='Marketing', phone='555-9999')
+
+#     leonard = Employee(name='Leonard', dept=dl)
+#     liz = Employee(name='Liz', dept=dl)
+#     maggie = Employee(name='Maggie', dept=dm)
+#     nadine = Employee(name='Nadine')
+
+#     db.session.add_all([df, dl, dm, leonard, liz, maggie, nadine])
+#     db.session.commit()
+
+
 ##############################################################################
 # Helper functions
 
