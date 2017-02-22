@@ -1,19 +1,14 @@
-"""Site for animal rescues to administer"""
-
-import os
-from flask import (Flask, jsonify, render_template, redirect, request, flash,
-                   session, url_for)
+from flask import (Flask, render_template, redirect, request, flash,
+                   session)
 from flask_debugtoolbar import DebugToolbarExtension
 from jinja2 import StrictUndefined
-from model import Rescue, Animal, Gender, Size, Age, Admin, Breed, connect_to_db, db
-from sqlalchemy import func
-
+from model import Rescue, connect_to_db
 import control as c
 
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
-app.secret_key = "ABC"
+app.secret_key = 'ABC'
 
 # Normally, if you use an undefined variable in Jinja2, it fails
 # silently. This is horrible. Fix this so that, instead, it raises an
@@ -49,6 +44,7 @@ def load_rescue_info(rescue_id):
                            available_animals=available_animals,
                            title=title)
 
+
 @app.route('/rescue/<int:rescue_id>/animal/<int:animal_id>')
 def load_animal_info(rescue_id, animal_id):
     """ Displays details of each animal """
@@ -67,7 +63,7 @@ def load_admin_page(admin_id):
 
     title = 'Dashboard'
 
-    admin = c.get_admin(admin_id)
+    admin = c.get_admin_by_id(admin_id)
 
     # checks if a logged in admin exists and making sure that only the logged in admin only sees the admin page that belongs to them
     if 'current_admin' not in session or admin.email != session['current_admin']:
@@ -82,7 +78,7 @@ def load_rescue_info_admin_page(admin_id):
 
     title = 'Dashboard'
 
-    admin = c.get_admin(admin_id)
+    admin = c.get_admin_by_id(admin_id)
 
     # checks if a logged in admin exists and making sure that only the logged in admin only sees the admin page that belongs to them
     if 'current_admin' not in session or admin.email != session['current_admin']:
@@ -92,12 +88,6 @@ def load_rescue_info_admin_page(admin_id):
                                 title=title)
 
 
-# For a given file, return whether it's an allowed file or not
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
 # Route that will process the file upload and other form input data
 @app.route('/handle-add-animal', methods=['GET', 'POST'])
 def add_animal_process():
@@ -105,7 +95,9 @@ def add_animal_process():
 
     email = session['current_admin']
 
-    admin_id = c.get_admin_by_session(email)
+    #admin_id = c.get_admin_by_session(email)
+    admin = c.get_admin_by_session(email)
+    admin_id = admin.admin_id
 
     if request.method == 'POST':
         # Check if the post request has the file part
@@ -123,24 +115,27 @@ def add_animal_process():
             return redirect('/admin/' + str(admin_id))
 
         # Check if the file is one of the allowed types/extensions
-        # function that receives the request as an input and function will extract info and insert into  db
-        if uploaded_file and allowed_file(uploaded_file.filename):
-            rescue = c.add_animal(request, session, uploaded_file, app.config['UPLOAD_FOLDER'])
-
-    return redirect('/rescue/' + str(rescue.rescue_id))
+        if uploaded_file and c.allowed_file(uploaded_file.filename, ALLOWED_EXTENSIONS):
+            # passing the request and session object
+            animal = c.add_animal(request, session, app.config['UPLOAD_FOLDER'])
+    return redirect('/rescue/' + str(animal.rescue_id))
 
 
 @app.route('/handle-add-rescue', methods=['GET', 'POST'])
 def add_rescue_process():
     """ Sends admins form input to the database """
 
-    admin = db.session.query(Admin.admin_id).filter(Admin.email == session['current_admin']).first()
+    email = session['current_admin']
+
+    #admin_id = c.get_admin_by_session(email)
+    admin = c.get_admin_by_session(email)
+    admin_id = admin.admin_id
 
     if request.method == 'POST':
         # Check if the post request has the file part
         if 'file' not in request.files:
             flash('No file part')
-            return redirect('/admin/' + str(admin.admin_id))
+            return redirect('/admin/' + str(admin_id) + '/rescue-info')
 
         # Get the name of the uploaded file
         uploaded_file = request.files['file']
@@ -149,49 +144,18 @@ def add_rescue_process():
         # submits an empty part without filename
         if uploaded_file.filename == '':
             flash('No selected file')
-            return redirect('/admin/' + str(admin.admin_id))
+            return redirect('/admin/' + str(admin_id) + '/rescue-info')
 
         # Check if the file is one of the allowed types/extensions
-        if uploaded_file and allowed_file(uploaded_file.filename):
-            rescue_name = request.form.get("rescuename").title()
-            phone = request.form.get("phone")
-            address = request.form.get("address")
-            email = request.form.get("email")
+        if uploaded_file and c.allowed_file(uploaded_file.filename, ALLOWED_EXTENSIONS):
 
-            #rescue = db.session.query(Rescue).join(Admin).filter(Admin.email == session['current_admin']).first()
-            user_filename = uploaded_file.filename
+            rescue = c.add_rescue(request, session, app.config['UPLOAD_FOLDER'])
 
-            # Store the extension of uploaded file to add to user_filename
-            extension = user_filename.rsplit('.', 1)[1].lower()
+            # Get admin object of currently logged in admin
+            admin = c.get_admin_by_id(admin_id)
 
-            rescue = Rescue(name=rescue_name, phone=phone, address=address,
-                            email=email)
-
-            # Adding the rescue instance to the rescues table
-            db.session.add(rescue)
-
-            db.session.commit()
-
-            r_id = rescue.rescue_id
-
-            #Create file name based on the rescue's id
-            user_filename = str(r_id) + '.' + extension
-
-            # Move the file from the temporal folder to the upload folder that was set up
-            path = os.path.join(app.config['UPLOAD_FOLDER'], user_filename)
-
-            # Saving the file to the upload folder
-            uploaded_file.save(path)
-
-            # Updating the rescues table with rescue's image url
-            rescue.img_url = path
-
-            admin = Admin.query.get(admin.admin_id)
-
-            # Updating the admins table with the rescue's id
-            admin.rescue_id = r_id
-
-            db.session.commit()
+            # update admin row with its new rescue_id
+            c.update_admin_row(admin, rescue)
 
     return redirect('/success')
 
@@ -199,20 +163,23 @@ def add_rescue_process():
 @app.route('/success')
 def add_rescue_success():
     """ Show login page for admins only. """
+
     title = 'Success'
-    last_rescue_added = db.session.query(func.max(Rescue.rescue_id)).one()
-    last_rescue_added = last_rescue_added[0]
 
-    rescue_name = db.session.query(Rescue.name).filter(Rescue.rescue_id == last_rescue_added).one()
-    rescue_name = rescue_name[0]
+    last_rescue = c.get_last_rescue_added()
 
-    last_admin_added = db.session.query(func.max(Admin.admin_id)).one()
-    last_admin_added = last_admin_added[0]
+    rescue_name = last_rescue.name
+
+    rescue_id = last_rescue.rescue_id
+
+    last_admin = c.get_last_admin_added()
+
+    admin_id = last_admin.admin_id
 
     if 'current_admin' in session:
         return render_template("success_rescue_add.html",
-                               last_rescue_added=last_rescue_added,
-                               last_admin_added=last_admin_added,
+                               last_rescue_added=rescue_id,
+                               last_admin_added=admin_id,
                                rescue_name=rescue_name,
                                title=title)
     else:
@@ -224,7 +191,7 @@ def admin_login_form():
     """ Show login page for admins only. """
     title = 'Login'
     return render_template("admin_login_page.html",
-                            title=title)
+                           title=title)
 
 
 @app.route('/handle-admin-login', methods=['POST'])
@@ -234,26 +201,20 @@ def process_admin_login():
     entered_email = request.form.get("email")
     entered_password = request.form.get("password")
 
-    try:
-        admin = db.session.query(Admin).filter(Admin.email == entered_email).one()
-    except:
-        flash('Could not locate your account. Please click on sign up to create an account!')
-        return redirect('/')
-    if entered_password == admin.password:
-        session['current_admin'] = entered_email
-        ad_id = db.session.query(Admin.admin_id).filter(Admin.admin_id == admin.admin_id).one()
-        ad_id = ad_id[0]
-        flash('Logged in as %s' % entered_email)
+    admin = c.get_admin(entered_email, entered_password)
 
-        if admin.rescue_id is None:
-            #return redirect('/admin' + '/rescue-info' + '/' + str(ad_id))
-            return redirect('/admin' + '/' + str(ad_id) + '/rescue-info')
-        else:
-            # return to add animal page
-            return redirect('/admin' + '/' + str(ad_id))
-    else:
-        flash('Incorrect password. Please try logging in again.')
+    if admin is False:
+        flash('Invalid credentials. Please click on sign up to create an account!')
         return redirect('/')
+
+    session['current_admin'] = entered_email
+    ad_id = admin.admin_id
+    flash('Logged in as %s' % entered_email)
+
+    if admin.rescue_id is None:
+        return redirect('/admin' + '/' + str(ad_id) + '/rescue-info')
+    else:
+        return redirect('/admin' + '/' + str(ad_id))
 
 
 @app.route('/admin-logout')
@@ -266,7 +227,7 @@ def admin_logout():
 @app.route('/admin-signup')
 def admin_signup():
     title = 'Sign up'
-    return render_template("signup_page.html",
+    return render_template('signup_page.html',
                             title=title)
 
 if __name__ == "__main__":

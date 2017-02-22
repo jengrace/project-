@@ -1,5 +1,3 @@
-"""Models and database functions for HB project."""
-
 from flask_sqlalchemy import SQLAlchemy
 
 # This is the connection to the PostgreSQL database; we're getting this through
@@ -15,7 +13,7 @@ db = SQLAlchemy()
 class Species(db.Model):
     """ Types of animals on rescue page """
 
-    __tablename__ = "species"
+    __tablename__ = 'species'
 
     species_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     species_type = db.Column(db.String(20), nullable=True)
@@ -23,14 +21,14 @@ class Species(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Species species_id=%s species_type=%s" % (self.species_id,
+        return '<Species species_id=%s species_type=%s' % (self.species_id,
                                                            self.species_type)
 
 
 class Breed(db.Model):
     """ Types of breeds for the admin to choose from """
 
-    __tablename__ = "breeds"
+    __tablename__ = 'breeds'
 
     breed_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     breed_type = db.Column(db.String(50), nullable=True)
@@ -41,7 +39,7 @@ class Breed(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Species breed_id=%s breed_type=%s species_id=%s" % (self.breed_id,
+        return '<Species breed_id=%s breed_type=%s species_id=%s' % (self.breed_id,
                                                                      self.breed_type,
                                                                      self.species_id)
 
@@ -49,7 +47,7 @@ class Breed(db.Model):
 class Gender(db.Model):
     """ Gender of animals on rescue page"""
 
-    __tablename__ = "genders"
+    __tablename__ = 'genders'
 
     gender_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     gender_type = db.Column(db.String(20), nullable=True)
@@ -57,14 +55,14 @@ class Gender(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Gender gender_id=%s gender_category=%s" % (self.gender_id,
+        return '<Gender gender_id=%s gender_category=%s' % (self.gender_id,
                                                             self.gender_type)
 
 
 class Age(db.Model):
     """ Age of animals on rescue page """
 
-    __tablename__ = "ages"
+    __tablename__ = 'ages'
 
     age_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     age_category = db.Column(db.String(50), nullable=True)
@@ -72,14 +70,14 @@ class Age(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Age age_id=%s age_category=%s" % (self.age_id,
+        return '<Age age_id=%s age_category=%s' % (self.age_id,
                                                    self.age_category)
 
 
 class Size(db.Model):
     """ Size of animals on rescue page """
 
-    __tablename__ = "sizes"
+    __tablename__ = 'sizes'
 
     size_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     size_category = db.Column(db.String(50), nullable=True)
@@ -87,14 +85,14 @@ class Size(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Size size_id=%s size_category=%s" % (self.size_id,
+        return '<Size size_id=%s size_category=%s' % (self.size_id,
                                                       self.size_category)
 
 
 class Rescue(db.Model):
     """ Animal rescues on rescue website """
 
-    __tablename__ = "rescues"
+    __tablename__ = 'rescues'
 
     rescue_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(100), nullable=True)
@@ -106,14 +104,14 @@ class Rescue(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Rescue rescue_id=%s name=%s phone=%s " % (self.rescue_id,
+        return '<Rescue rescue_id=%s name=%s>' % (self.rescue_id,
                                                            self.name)
 
 
 class Admin(db.Model):
     """Administrators of admin site."""
 
-    __tablename__ = "admins"
+    __tablename__ = 'admins'
 
     admin_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(64), nullable=True)
@@ -123,7 +121,7 @@ class Admin(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Admin admin_id=%s rescue_id=%s>" % (self.admin_id,
+        return '<Admin admin_id=%s rescue_id=%s>' % (self.admin_id,
                                                      self.rescue_id)
 
     rescue = db.relationship('Rescue', backref=db.backref("admins", order_by=admin_id))
@@ -132,7 +130,7 @@ class Admin(db.Model):
 class Animal(db.Model):
     """ Animals on rescue website. """
 
-    __tablename__ = "animals"
+    __tablename__ = 'animals'
 
     animal_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     img_url = db.Column(db.String(300), nullable=True, default='static/images/dog.png')
@@ -156,7 +154,7 @@ class Animal(db.Model):
 
     def __repr__(self):
         """Provide helpful representation when printed."""
-        return "<Animal animal_id=%s name=%s>" % (self.animal_id,
+        return '<Animal animal_id=%s name=%s>' % (self.animal_id,
                                                   self.name)
 
 ##############################################################################
