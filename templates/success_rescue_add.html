@@ -1,23 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{% if 'current_admin' in session %}
-  <h2> You've successfully added your rescue to the page! </h2>
+  {% if 'current_admin' in session %}
+    <h2> You've successfully added your rescue to the page! </h2>
 
-  Click here to go to your page: <a href="/rescue/{{ last_rescue_added }}">{{ rescue_name }}</a>
+    Click here to go to your page: <a href="/rescue/{{ last_rescue_added }}">{{ rescue_name }}</a>
 
-  <br>
-  <br>
+    <br>
+    <br>
 
-  OR
+    OR
 
-  <br>
-  <br>
+    <br>
+    <br>
 
-  Click here to add the animals up for adoption to your page: <a href="/admin/{{ last_admin_added }}">Add animals</a>
-{% else %}
-  <h2>You must have special permission to see this page.</h2>
-
-{% endif %}
+    Click here to add the animals up for adoption to your page: <a href="/admin/{{ last_admin_added }}">Add animals</a>
+  {% else %}
+    <h2>You must have special permission to see this page.</h2>
+  {% endif %}
 
 {% endblock %}

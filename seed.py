@@ -1,7 +1,5 @@
-"""Utility file to seed ratings database from MovieLens data in seed_data/"""
+"""Utility file to seed project database from mock rescue data in seed_data/"""
 
-#from sqlalchemy import func
-#from datetime import datetime
 from model import Admin, Animal, Rescue, Age, Gender, Size, Species, Breed
 from model import connect_to_db, db
 from server import app
@@ -21,10 +19,7 @@ def load_admins():
                       password=password,
                       rescue_id=rescue_id)
 
-        # We need to add to the session or it won't ever be stored
         db.session.add(admin)
-
-    # Once we're done, we should commit our work
     db.session.commit()
 
 
@@ -43,7 +38,6 @@ def load_rescues():
                         email=email)
 
         db.session.add(rescue)
-
     db.session.commit()
 
 
@@ -63,7 +57,6 @@ def load_animals():
                         breed_id=breed_id)
 
         db.session.add(animal)
-
     db.session.commit()
 
 
@@ -79,7 +72,6 @@ def load_ages():
         age = Age(age_category=age_category)
 
         db.session.add(age)
-
     db.session.commit()
 
 
@@ -95,7 +87,6 @@ def load_genders():
         gender = Gender(gender_type=gender_type)
 
         db.session.add(gender)
-
     db.session.commit()
 
 
@@ -110,7 +101,6 @@ def load_sizes():
         size = Size(size_category=size_category)
 
         db.session.add(size)
-
     db.session.commit()
 
 
@@ -126,7 +116,6 @@ def load_species():
         species = Species(species_type=species_type)
 
         db.session.add(species)
-
     db.session.commit()
 
 
@@ -142,44 +131,10 @@ def load_breeds():
         breed = Breed(breed_type=breed_type, species_id=species_id)
 
         db.session.add(breed)
-
     db.session.commit()
 
 
-# def set_val_admin_id():
-#     """Set value for the next user_id after seeding database"""
-
-#     # Get the Max user_id in the database
-#     result = db.session.query(func.max(Admin.admin_id)).one()
-#     max_id = int(result[0])
-
-#     # Set the value for the next user_id to be max_id + 1
-#     query = "SELECT setval('admins_admin_id_seq', :new_id)"
-#     db.session.execute(query, {'new_id': max_id + 1})
-#     db.session.commit()
-
-
-# def set_val_animal_id():
-#     """Set value for the next user_id after seeding database"""
-
-#     # Get the Max user_id in the database
-#     result = db.session.query(func.max(Animal.animal_id)).one()
-#     max_id = int(result[0])
-
-#     # Set the value for the next user_id to be max_id + 1
-#     query = "SELECT setval('animals_animal_id_seq', :new_id)"
-#     db.session.execute(query, {'new_id': max_id + 1})
-#     db.session.commit()
-
-if __name__ == "__main__":
-    connect_to_db(app)
-
-    #db.session.close()
-    db.drop_all()
-
-    # In case tables haven't been created, create them
-    db.create_all()
-
+def load_all():
     # Import different types of data
     load_species()
     load_breeds()
@@ -190,5 +145,13 @@ if __name__ == "__main__":
     load_animals()
     load_admins()
 
-    #set_val_admin_id()
-    #set_val_animal_id()
+
+if __name__ == "__main__":
+    connect_to_db(app)
+
+    db.drop_all()
+
+    # In case tables haven't been created, create them
+    db.create_all()
+
+    load_all()

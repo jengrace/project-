@@ -1,34 +1,35 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<img alt="portrait" src = "/{{ animal_info.img_url }}">
+  <img alt="portrait" src = "/{{ animal_info.img_url }}">
 
-<br>
-<br>
+  <br>
+  <br>
 
-Name: {{ animal_info.name }}
-<br>
-<br>
+  Name: {{ animal_info.name }}
+  <br>
+  <br>
 
-Gender: {{ animal_info.gender_type }}
+  Gender: {{ animal_info.gender_type }}
 
-<br>
-<br>
+  <br>
+  <br>
 
-Age: {{ animal_info.age_category}}
+  Age: {{ animal_info.age_category}}
 
-<br>
-<br>
+  <br>
+  <br>
 
-Size: {{ animal_info.size_category }}
+  Size: {{ animal_info.size_category }}
 
-<br>
-<br>
+  <br>
+  <br>
 
-Breed: {{ animal_info.breed_type }}
+  Breed: {{ animal_info.breed_type }}
 
-<br>
-<br>
+  <br>
+  <br>
 
-Bio: {{ animal_info.bio }}
+  Bio: {{ animal_info.bio }}
+
 {% endblock %}

@@ -1,14 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<form action='/handle-admin-login' method='POST'>
-Email: <input type='text' name='email'></input><br>
-<br>
-Password: <input type='password' name='password'></input><br>
-<br>
-<input type='submit' value='Login'></input>
-
-</form>
-
+  <form action='/handle-admin-login' method='POST'>
+    Email: <input type='text' name='email'></input><br>
+    <br>
+    Password: <input type='password' name='password'></input><br>
+    <br>
+    <input type='submit' value='Login'></input>
+  </form>
 
 {% endblock %}

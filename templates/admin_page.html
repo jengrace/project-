@@ -1,140 +1,136 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class=flashes>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
 
 
-<form action='/handle-add-animal' enctype='multipart/form-data' method='POST'>
-  <b>Please provide information for each animal: </b>
-  <br>
-  <br>
-  Name: <input type='text' name='name'></input>
+  <form action='/handle-add-animal' enctype='multipart/form-data' method='POST'>
+    <b>Please provide information for each animal: </b>
+    <br>
+    <br>
+    Name: <input type='text' name='name'></input>
 
-  <br>
-  <br>
-  
-  Upload photo: <input type='file' name='file'>
-  <br>
-  <br>
+    <br>
+    <br>
+    
+    Upload photo: <input type='file' name='file'>
+    <br>
+    <br>
 
-  Gender: 
-  <select name="gender">
-    <option value="Unknown">Unknown</option>
-    <option value="Female">Female</option>
-    <option value="Male">Male</option>
-  </select>
+    Gender: 
+    <select name="gender">
+      <option value="Unknown">Unknown</option>
+      <option value="Female">Female</option>
+      <option value="Male">Male</option>
+    </select>
 
-  <br>
-  <br>
+    <br>
+    <br>
 
-  Age:
-  <select name="age">
-    <option value="Unknown">Unknown</option>
-    <option value="0 - 9 months">0 - 9 months</option>
-    <option value="9 - 18 months">9 - 18 months</option>
-    <option value="18 months - 7 years">18 months - 7 years)</option>
-    <option value="7+ years">7+ years</option>
-  </select>
+    Age:
+    <select name="age">
+      <option value="Unknown">Unknown</option>
+      <option value="0 - 9 months">0 - 9 months</option>
+      <option value="9 - 18 months">9 - 18 months</option>
+      <option value="18 months - 7 years">18 months - 7 years)</option>
+      <option value="7+ years">7+ years</option>
+    </select>
 
-  <br>
-  <br>
+    <br>
+    <br>
 
-  Size:
-  <select name="size">
-    <option value="Unknown">Unknown</option>
-    <option value="0 - 10 lbs">0 - 10 lbs</option>
-    <option value="10 - 25 lbs">10 - 25 lbs</option>
-    <option value="25 - 60 lbs">25 - 60 lbs</option>
-    <option value="60 - 100 lbs">60 - 100 lbs</option>
-    <option value="100+ lbs">100+ lbs</option>
-  </select>
+    Size:
+    <select name="size">
+      <option value="Unknown">Unknown</option>
+      <option value="0 - 10 lbs">0 - 10 lbs</option>
+      <option value="10 - 25 lbs">10 - 25 lbs</option>
+      <option value="25 - 60 lbs">25 - 60 lbs</option>
+      <option value="60 - 100 lbs">60 - 100 lbs</option>
+      <option value="100+ lbs">100+ lbs</option>
+    </select>
 
-  <br>
-  <br>
+    <br>
+    <br>
 
-<div id="species-selection">
-  Species:
-  <br>
-  <input id="dog-selection" type="radio" name="species" value="Dog" checked="checked">Dog
-  <input id="cat-selection" type="radio" name="species" value="Cat">Cat 
-</div>
-  
-  <br>
-  <br>
+    <div id="species-selection">
+      Species:
+      <br>
+      <input id="dog-selection" type="radio" name="species" value="Dog" checked="checked">Dog
+      <input id="cat-selection" type="radio" name="species" value="Cat">Cat 
+    </div>
 
-
-
-<div id="div_breeds"></div>
-
-
-  <br>
-  <br>
-
-  Bio:
-  <textarea placeholder="Type bio here (max: 300)" name='bio' maxlength="300" rows="5" cols="40"></textarea>
-
-  <br>
-  <br>
-
-  Adopted? Please update to Yes when adopted!
-  <select name="is_adopted">
-    <option value="f">No</option>
-    <option value="t">Yes</option>
-  </select>
-
-  <br>
-  <br>
-
-  Visible to page? Please update to No if you don't want to currently display this animal on your page!
-  <select name="is_visible">
-    <option value="t">Yes</option>
-    <option value="f">No</option>
-  </select>
-
-
-  <br>
-  <br>
-  
-  <input type='submit' value='Submit'>
-</form>
+    <br>
+    <br>
 
 
 
-<br>
-<br>
-
-<div>
-{% if 'current_admin' in session %}
-  <a href='/admin-logout' style=>Logout</a>
-{% endif %}
-</div>
+    <div id="div_breeds"></div>
 
 
-<script>
-  "use strict";
+    <br>
+    <br>
 
-  var dog_div_code = 'Please select a breed:<br><select name="breeds"><option value="Mixed Breed">Mixed Breed</option><option value="Golden Retriever">Golden Retriever</option><option value="Chihuahua">Chihuahua</option><option value="German Shepherd">German Shepherd</option><option value="Labrador Retriever">Labrador Retriever</option></select>';
+    Bio:
+    <textarea placeholder="Type bio here (max: 300)" name='bio' maxlength="300" rows="5" cols="40"></textarea>
 
-  var cat_div_code = 'Please select a breed:<br><select name="breeds"><option value="Domestic Shorthair">Domestic Shorthair</option><option value="Domestic Medium Hair">Domestic Medium Hair</option><option value="Domestic Longhair">Domestic Longhair</option><option value="Persian">Persian</option><option value="Bengal">Bengal</option><option value="Siamese">Siamese</option><option value="Mix">Mix</option></select>';
+    <br>
+    <br>
 
-  $('#div_breeds').html(dog_div_code);
-  
-  $('#cat-selection').on('click', function() {
-    $('#div_breeds').html(cat_div_code);
-  });
-  
-  $('#dog-selection').on('click', function() {
-    $('#div_breeds').html(dog_div_code);  
-  });
+    Adopted? Please update to Yes when adopted!
+    <select name="is_adopted">
+      <option value="f">No</option>
+      <option value="t">Yes</option>
+    </select>
 
-</script>
+    <br>
+    <br>
+
+    Visible to page? Please update to No if you don't want to currently display this animal on your page!
+    <select name="is_visible">
+      <option value="t">Yes</option>
+      <option value="f">No</option>
+    </select>
+
+
+    <br>
+    <br>
+    
+    <input type='submit' value='Submit'>
+  </form>
+
+
+
+    <br>
+    <br>
+
+    <div>
+    {% if 'current_admin' in session %}
+      <a href='/admin-logout' style=>Logout</a>
+    {% endif %}
+    </div>
+
+
+  <script>
+    "use strict";
+    var dog_div_code = 'Please select a breed:<br><select name="breeds"><option value="Mixed Breed">Mixed Breed</option><option value="Golden Retriever">Golden Retriever</option><option value="Chihuahua">Chihuahua</option><option value="German Shepherd">German Shepherd</option><option value="Labrador Retriever">Labrador Retriever</option></select>';
+    var cat_div_code = 'Please select a breed:<br><select name="breeds"><option value="Domestic Shorthair">Domestic Shorthair</option><option value="Domestic Medium Hair">Domestic Medium Hair</option><option value="Domestic Longhair">Domestic Longhair</option><option value="Persian">Persian</option><option value="Bengal">Bengal</option><option value="Siamese">Siamese</option><option value="Mix">Mix</option></select>';
+    $('#div_breeds').html(dog_div_code);
+    
+    $('#cat-selection').on('click', function() {
+      $('#div_breeds').html(cat_div_code);
+    });
+    
+    $('#dog-selection').on('click', function() {
+      $('#div_breeds').html(dog_div_code);  
+    });
+  </script>
 
 {% endblock %}

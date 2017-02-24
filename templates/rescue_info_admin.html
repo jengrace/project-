@@ -1,46 +1,46 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class=flashes>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form action='/handle-add-rescue' enctype='multipart/form-data' method='POST'>
+    <b>Please provide your rescue's information: </b>
+    <br>
+    <br> 
+    Organizations' Name: <input type='text' name='rescuename'></input>
+    <br>
+    <br>
+    Upload photo: <input type='file' name='file'>
+    <br>
+    <br>
+    Phone: <input type='text' name='phone'></input>
+    <br>
+    <br>
+    Address: <input type='text' name='address'></input>
+    <br>
+    <br>
+    Email: <input type='text' name='email'></input>
+    <br>
+    <br>
+
+    <input type='submit' value='Submit'>
+  </form>
+
+  <br>
+  <br>
+
+  <div>
+  {% if 'current_admin' in session %}
+    <a href='/admin-logout' style=>Logout</a>
   {% endif %}
-{% endwith %}
-
-<form action='/handle-add-rescue' enctype='multipart/form-data' method='POST'>
-  <b>Please provide your rescue's information: </b>
-  <br>
-  <br> 
-  Organizations' Name: <input type='text' name='rescuename'></input>
-  <br>
-  <br>
-  Upload photo: <input type='file' name='file'>
-  <br>
-  <br>
-  Phone: <input type='text' name='phone'></input>
-  <br>
-  <br>
-  Address: <input type='text' name='address'></input>
-  <br>
-  <br>
-  Email: <input type='text' name='email'></input>
-  <br>
-  <br>
-
-  <input type='submit' value='Submit'>
-</form>
-
-<br>
-<br>
-
-<div>
-{% if 'current_admin' in session %}
-  <a href='/admin-logout' style=>Logout</a>
-{% endif %}
-</div>
+  </div>
 
 {% endblock %}

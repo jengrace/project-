@@ -9,13 +9,14 @@ def get_rescue(rescue_id):
     Output: Rescue model object
     """
 
-    return m.db.session.query(m.Rescue).filter(m.Rescue.rescue_id == rescue_id).first()
+    return m.db.session.query(m.Rescue).filter(
+        m.Rescue.rescue_id == rescue_id).first()
 
 
 def get_animal(animal_id):
     """ Get animal details
     Input: id(int) of an animal from the animals table
-    Output: List of Animal model objects
+    Output: Animal model object
     """
 
     return m.db.session.query(m.Animal.animal_id, m.Animal.img_url,
@@ -25,16 +26,18 @@ def get_animal(animal_id):
                               m.Age.age_category, m.Size.size_category,
                               m.Breed.breed_type).outerjoin(
                               m.Gender, m.Age, m.Size,
-                              m.Breed).filter(m.Animal.animal_id == animal_id).first()
+                              m.Breed).filter(
+                              m.Animal.animal_id == animal_id).first()
 
 
 def get_available_animals(rescue_id):
     """ Get animals that are currently available for adoption
     Input: id(int) of a rescue from the rescues table
-    Output: Rescue model object
+    Output: List of Animal model objects
     """
 
-    return m.db.session.query(m.Animal).filter(m.Animal.rescue_id == rescue_id, m.Animal.is_adopted == 'f', m.Animal.is_visible == 't').all()
+    return m.db.session.query(m.Animal).filter(
+        m.Animal.rescue_id == rescue_id, m.Animal.is_adopted == 'f', m.Animal.is_visible == 't').all()
 
 
 def get_admin_by_id(admin_id):
@@ -43,7 +46,8 @@ def get_admin_by_id(admin_id):
     Output: Admin model object
     """
 
-    return m.db.session.query(m.Admin).filter(m.Admin.admin_id == admin_id).first()
+    return m.db.session.query(m.Admin).filter(
+        m.Admin.admin_id == admin_id).first()
 
 
 def get_admin_by_session(email):
@@ -56,8 +60,8 @@ def get_admin_by_session(email):
 
 
 def allowed_file(filename, ALLOWED_EXTENSIONS):
-    """ Return whether the file is an allowed file or not 
-    Inputs: filename of uploaded file(string), set of strings 
+    """ Return whether the file is an allowed file or not
+    Inputs: filename of uploaded file(string), set of strings
     Output: True or False
     """
 
@@ -67,7 +71,7 @@ def allowed_file(filename, ALLOWED_EXTENSIONS):
 
 def add_animal(admin_request, admin_session, upload_folder):
     """ Add new animal to the database
-    Inputs: request object, session dictionary, path to the upload directory(string)
+    Inputs: request object, session dictionary, upload directory path(string)
     Output: Rescue model object that belongs to the logged in admin user
     """
 
@@ -80,17 +84,21 @@ def add_animal(admin_request, admin_session, upload_folder):
     is_adopted = admin_request.form.get('is_adopted')
     is_visible = admin_request.form.get('is_visible')
 
-    gender_id = m.db.session.query(m.Gender.gender_id).filter(m.Gender.gender_type == gender).first()
-    age_id = m.db.session.query(m.Age.age_id).filter(m.Age.age_category == age).first()
-    size_id = m.db.session.query(m.Size.size_id).filter(m.Size.size_category == size).first()
-    breed_id = m.db.session.query(m.Breed.breed_id).filter(m.Breed.breed_type == breed).first()
+    gender_id = m.db.session.query(m.Gender.gender_id).filter(
+        m.Gender.gender_type == gender).first()
+    age_id = m.db.session.query(m.Age.age_id).filter(
+        m.Age.age_category == age).first()
+    size_id = m.db.session.query(m.Size.size_id).filter(
+        m.Size.size_category == size).first()
+    breed_id = m.db.session.query(m.Breed.breed_id).filter(
+        m.Breed.breed_type == breed).first()
 
     # return the rescue that belongs to the logged in admin, func will be returning this!
-    rescue = m.db.session.query(m.Rescue).join(m.Admin).filter(m.Admin.email == admin_session['current_admin']).first()
+    rescue = m.db.session.query(m.Rescue).join(m.Admin).filter(
+        m.Admin.email == admin_session['current_admin']).first()
 
     # temporary filename
     user_filename = admin_request.files['file'].filename
-
     # Store the extension of uploaded file to add to user_filename
     extension = user_filename.rsplit('.', 1)[1].lower()
 
@@ -108,13 +116,10 @@ def add_animal(admin_request, admin_session, upload_folder):
 
     # rename filename
     user_filename = str(rescue.rescue_id) + '-' + str(a_id) + '.' + extension
-
     path = os.path.join(upload_folder, user_filename)
-
     admin_request.files['file'].save(path)
 
     animal.img_url = path
-
     m.db.session.commit()
 
     return rescue
@@ -133,7 +138,6 @@ def add_rescue(admin_request, admin_session, upload_folder):
 
     # temporary filename
     user_filename = admin_request.files['file'].filename
-
     # storing the extension of uploaded file
     extension = user_filename.rsplit('.', 1)[1].lower()
 
@@ -143,25 +147,21 @@ def add_rescue(admin_request, admin_session, upload_folder):
 
     # adding new instance/row to the rescue table
     m.db.session.add(rescue)
-
     # commit the new instance
     m.db.session.commit()
 
     # getting rescue_id of rescue that was just commited
     r_id = rescue.rescue_id
 
-    #Create file name based on the rescue's id
+    # Create file name based on the rescue's id
     user_filename = str(r_id) + '.' + extension
-
     # Move the file from the temporal folder to the upload folder that was set up
     path = os.path.join(upload_folder, user_filename)
-
     # Saving the file to the upload folder
     admin_request.files['file'].save(path)
 
     # Updating the rescues table with rescue's image url
     rescue.img_url = path
-
     m.db.session.commit()
 
     return rescue
@@ -182,7 +182,8 @@ def get_last_rescue_added():
     Output: Resue model object
     """
 
-    last_rescue_id_added = m.db.session.query(sqlalchemy.func.max(m.Rescue.rescue_id)).one()
+    last_rescue_id_added = m.db.session.query(sqlalchemy.func.max(
+        m.Rescue.rescue_id)).one()
     last_rescue_id_added = last_rescue_id_added[0]
     last_rescue = get_rescue(last_rescue_id_added)
 
@@ -194,7 +195,8 @@ def get_last_admin_added():
     Output: Admin model object
     """
 
-    last_admin_id_added = m.db.session.query(sqlalchemy.func.max(m.Admin.admin_id)).one()
+    last_admin_id_added = m.db.session.query(sqlalchemy.func.max(
+        m.Admin.admin_id)).one()
     last_admin_id_added = last_admin_id_added[0]
     last_admin = get_admin_by_id(last_admin_id_added)
 
@@ -208,7 +210,8 @@ def get_admin(email, password):
     """
 
     try:
-        admin = m.db.session.query(m.Admin).filter(m.Admin.email == email).one()
+        admin = m.db.session.query(m.Admin).filter(
+            m.Admin.email == email).one()
     except sqlalchemy.orm.exc.NoResultFound:
         return False
     if password == admin.password:

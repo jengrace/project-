@@ -7,12 +7,8 @@ import control as c
 
 app = Flask(__name__)
 
-# Required to use Flask sessions and the debug toolbar
 app.secret_key = 'ABC'
 
-# Normally, if you use an undefined variable in Jinja2, it fails
-# silently. This is horrible. Fix this so that, instead, it raises an
-# error.
 app.jinja_env.undefined = StrictUndefined
 
 
@@ -50,7 +46,7 @@ def load_animal_info(rescue_id, animal_id):
     title = animal_info.name
 
     return render_template('animal_info.html', animal_info=animal_info,
-                            title=title)
+                           title=title)
 
 
 @app.route('/admin/<int:admin_id>')
@@ -60,7 +56,7 @@ def load_admin_page(admin_id):
     title = 'Dashboard'
     admin = c.get_admin_by_id(admin_id)
 
-    # checks if a logged in admin exists and making sure that only the logged in admin only sees the admin page that belongs to them
+    # redirects to homepage if user is not the logged in user
     if 'current_admin' not in session or admin.email != session['current_admin']:
         return redirect('/')
     else:
@@ -74,12 +70,12 @@ def load_rescue_info_admin_page(admin_id):
     title = 'Dashboard'
     admin = c.get_admin_by_id(admin_id)
 
-    # checks if a logged in admin exists and making sure that only the logged in admin only sees the admin page that belongs to them
+    # redirects to homepage if user is not the logged in user
     if 'current_admin' not in session or admin.email != session['current_admin']:
         return redirect('/')
     else:
         return render_template('rescue_info_admin.html', admin=admin,
-                                title=title)
+                               title=title)
 
 
 # Route that will process the file upload and other form input data
@@ -210,7 +206,7 @@ def admin_signup():
     title = 'Sign up'
 
     return render_template('signup_page.html',
-                            title=title)
+                           title=title)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

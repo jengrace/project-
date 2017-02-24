@@ -1,8 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 
-# This is the connection to the PostgreSQL database; we're getting this through
-# the Flask-SQLAlchemy helper library. On this, we can find the `session`
-# object, where we do most of our interactions (like committing, etc.)
 
 db = SQLAlchemy()
 
@@ -105,7 +102,7 @@ class Rescue(db.Model):
         """Provide helpful representation when printed."""
 
         return '<Rescue rescue_id=%s name=%s>' % (self.rescue_id,
-                                                           self.name)
+                                                  self.name)
 
 
 class Admin(db.Model):
@@ -135,7 +132,7 @@ class Animal(db.Model):
     animal_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     img_url = db.Column(db.String(300), nullable=True, default='static/images/dog.png')
     name = db.Column(db.String(40), nullable=True)
-    bio = db.Column(db.Text, nullable=True, default='Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi iaculis pretium lorem nec commodo. Etiam auctor, lectus a ultricies interdum, sapien massa commodo velit, quis egestas dolor mi sed neque.')
+    bio = db.Column(db.Text, nullable=True, default='Loving and very sweet. Looking for furever home!')
     is_adopted = db.Column(db.Boolean, nullable=True, default=False)  # will be a True or False
     is_visible = db.Column(db.Boolean, nullable=True, default=True)  # will be a True or False
     rescue_id = db.Column(db.Integer, db.ForeignKey('rescues.rescue_id'), nullable=True)
@@ -157,30 +154,15 @@ class Animal(db.Model):
         return '<Animal animal_id=%s name=%s>' % (self.animal_id,
                                                   self.name)
 
-# def example_data():
-#     """Create some sample data."""
-
-#     admin = Admin(dept_code='fin', dept='Finance', phone='555-1000')
-#     rescue = Rescue(dept_code='legal', dept='Legal', phone='555-2222')
-#     animal = Animal(dept_code='mktg', dept='Marketing', phone='555-9999')
-
-#     leonard = Employee(name='Leonard', dept=dl)
-#     liz = Employee(name='Liz', dept=dl)
-#     maggie = Employee(name='Maggie', dept=dm)
-#     nadine = Employee(name='Nadine')
-
-#     db.session.add_all([df, dl, dm, leonard, liz, maggie, nadine])
-#     db.session.commit()
-
 
 ##############################################################################
 # Helper functions
 
-def connect_to_db(app):
+def connect_to_db(app, db_uri='postgresql:///project'):
     """Connect the database to our Flask app."""
 
     # Configure to use our PstgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///project'
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     db.app = app
     db.init_app(app)
 

@@ -1,33 +1,30 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class=flashes>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <h2> Animal Rescues </h2>
+  <ul>
+    {% for rescue in rescues %}
+      <li>
+        <a href="/rescue/{{ rescue.rescue_id }}">
+          {{ rescue.name }}
+        </a>
+      </li>
     {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
+  </ul>
 
-<h2> Animal Rescues </h2>
-<ul>
-  {% for rescue in rescues %}
-    <li>
-      <a href="/rescue/{{ rescue.rescue_id }}">
-        {{ rescue.name }}
-      </a>
-    </li>
-  {% endfor %}
-</ul>
-
-<a href="/admin-login">Site user login</a>
-<br>
-<br>
-<a href="/admin-signup">Sign up</a>
-
-
-
+  <a href="/admin-login">Site user login</a>
+  <br>
+  <br>
+  <a href="/admin-signup">Sign up</a>
 
 {% endblock %}
