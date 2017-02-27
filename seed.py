@@ -8,12 +8,15 @@ from server import app
 def load_admins():
     """Load admins from u.admin into database."""
 
-    print "Administrators"
+    #print "Administrators"
 
     # Read u.admin file and insert data
     for row in open("seed_data/u.admin"):
         row = row.rstrip()
         admin_id, email, password, rescue_id = row.split("|")
+
+        if rescue_id == '':
+            rescue_id = None
 
         admin = Admin(email=email,
                       password=password,
@@ -26,7 +29,7 @@ def load_admins():
 def load_rescues():
     """Load rescues from u.rescue into database."""
 
-    print "Rescues"
+    #print "Rescues"
 
     for row in open('seed_data/u.rescue'):
         row = row.rstrip()
@@ -44,7 +47,7 @@ def load_rescues():
 def load_animals():
     """Load animals from u.animal into database."""
 
-    print "Animals"
+    #print "Animals"
 
     for row in open("seed_data/u.animal"):
         row = row.rstrip()
@@ -63,7 +66,7 @@ def load_animals():
 def load_ages():
     """Load ages from u.age into database."""
 
-    print "Ages"
+    #print "Ages"
 
     for row in open('seed_data/u.age'):
         row = row.rstrip()
@@ -78,7 +81,7 @@ def load_ages():
 def load_genders():
     """Load genders from u.gender into database."""
 
-    print "Genders"
+    #print "Genders"
 
     for row in open('seed_data/u.gender'):
         row = row.rstrip()
@@ -93,7 +96,7 @@ def load_genders():
 def load_sizes():
     """Load sizes from u.size into database."""
 
-    print "Sizes"
+    #print "Sizes"
 
     for row in open('seed_data/u.size'):
         row = row.rstrip()
@@ -107,7 +110,7 @@ def load_sizes():
 def load_species():
     """ Load species from u.species """
 
-    print "Species"
+    #print "Species"
 
     for row in open('seed_data/u.species'):
         row = row.rstrip()
@@ -122,7 +125,7 @@ def load_species():
 def load_breeds():
     """ Load breeds from u.breeds """
 
-    print "Breeds"
+    #print "Breeds"
 
     for row in open('seed_data/u.breeds'):
         row = row.rstrip()
