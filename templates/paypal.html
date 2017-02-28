@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div id="paypal-button"></div>
+
+<script>
+    "use strict";
+    paypal.Button.render({
+    
+        env: 'sandbox', // Specify 'sandbox' for the test environment
+
+        client: {
+            sandbox: '{{ client_id }}'
+            //production: 'xxxxxxxxx'
+        },
+
+
+        payment: function() {
+            // Set up the payment here, when the buyer clicks on the button
+            var env    = this.props.env;
+            var client = this.props.client;
+        
+            return paypal.rest.payment.create(env, client, {
+                transactions: [
+                    {
+                        amount: { total: '1.00', currency: 'USD' }
+                    }
+                ]
+            });
+        },
+
+        commit: true, // Optional: show a 'Pay Now' button in the checkout flow
+
+        onAuthorize: function(data, actions) {
+            // Execute the payment here, when the buyer approves the transaction
+
+            return actions.payment.execute().then(function() {
+                // Show a success page to the buyer
+            });
+       }
+            
+    }, '#paypal-button');
+</script>
+
+
+{% endblock %}

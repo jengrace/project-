@@ -72,7 +72,8 @@ def allowed_file(filename, ALLOWED_EXTENSIONS):
 def add_animal(admin_request, admin_session, upload_folder):
     """ Add new animal to the database
     Inputs: request object, session dictionary, upload directory path(string)
-    Output: Rescue model object that belongs to the logged in admin user
+    Output: Rescue model object that belongs to the logged in admin user to use
+    for the URL redirect route.
     """
 
     name = admin_request.form.get('name').title()

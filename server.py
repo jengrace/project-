@@ -4,6 +4,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from jinja2 import StrictUndefined
 from model import Rescue, connect_to_db
 import control as c
+import os
 
 app = Flask(__name__)
 
@@ -21,6 +22,18 @@ def index():
 
     return render_template('homepage.html',
                            rescues=rescues,
+                           title=title)
+
+
+@app.route('/payments')
+def paypal_testing():
+    """Temp page for integrating PayPal API"""
+
+    title = 'PayPal Testing'
+    client_id = os.environ['PAYPAL_CLIENT_ID']
+
+    return render_template('paypal.html',
+                           client_id=client_id,
                            title=title)
 
 
