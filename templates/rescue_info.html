@@ -1,6 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<div style="float:right">
+  <div>Consider donating to {{ rescue_info.name }} <br>
+    to help support the animals:</div>
+  <br>
+  <div id="paypal-button"></div>
+
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+    <input type="hidden" name="cmd" value="_s-xclick">
+    <input type="hidden" name="hosted_button_id" value="KQVGDWJD45YTW">
+    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+    <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+  </form>
+</div>
   <h2> {{ rescue_info.name }} </h2>
   <br>
   <br>
@@ -14,15 +27,50 @@
   <br>
   <br>
   Phone: {{ rescue_info.phone }}
-
   <h2> Adopt a Pet: </h2>
   {% for animal in available_animals %}
-    {{ animal.name }}
-    <br>
-    <a href = "/rescue/{{rescue_info.rescue_id}}/animal/{{ animal.animal_id }}">
-    <img alt="portrait" src = "/{{ animal.img_url }}">
-    </a>
-    <br>
+      {{ animal.name }}
+      <br>
+      <a href = "/rescue/{{rescue_info.rescue_id}}/animal/{{ animal.animal_id }}">
+      <img alt="portrait" src = "/{{ animal.img_url }}">
+      </a>
+      <br>
   {% endfor %}
+  <div id="animals">
+  </div>
+
+  <script>
+    var rescue_id = {{ rescue_info.rescue_id }}
+  </script>
+  <script>
+    var counter = 0;
+    function amountscrolled(){
+        var winheight = $(window).height() // the height of the browser window
+        var docheight = $(document).height() // the height of the entire document 
+        var scrollTop = $(window).scrollTop() // detects how much the user has scrolled the page 
+        var trackLength = docheight - winheight // total scrollable area of a document
+        var pctScrolled = Math.floor(scrollTop/trackLength * 100) // gets percentage scrolled (ie: 80 NaN if tracklength == 0)
+        console.log(pctScrolled + '% scrolled')
+        
+        function loadMoreAnimals(results) {
+            console.log(results);
+            if (results != '') {
+                console.log(results);
+                $("#animals").append(results);
+            }
+        }
+        if (pctScrolled > 90) { // load more animals
+            $.get('/handle-loading', {rescueid : rescue_id, counter : counter }, loadMoreAnimals);
+            counter = counter + 1;
+            console.log(counter)
+        }
+    } 
+    
+
+    $(window).on("scroll", function(){ 
+      amountscrolled()
+    })
+
+  </script>
 
 {% endblock %}

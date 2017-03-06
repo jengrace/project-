@@ -4,7 +4,10 @@ from flask_debugtoolbar import DebugToolbarExtension
 from jinja2 import StrictUndefined
 from model import Rescue, connect_to_db
 import control as c
+import sqlalchemy
+import model as m
 import os
+
 
 app = Flask(__name__)
 
@@ -25,18 +28,6 @@ def index():
                            title=title)
 
 
-@app.route('/payments')
-def paypal_testing():
-    """Temp page for integrating PayPal API"""
-
-    title = 'PayPal Testing'
-    client_id = os.environ['PAYPAL_CLIENT_ID']
-
-    return render_template('paypal.html',
-                           client_id=client_id,
-                           title=title)
-
-
 @app.route('/rescue/<int:rescue_id>')
 def load_rescue_info(rescue_id):
     """ Displays rescue details and list of available dogs & cats """
@@ -44,6 +35,7 @@ def load_rescue_info(rescue_id):
     rescue_info = c.get_rescue(rescue_id)
     title = rescue_info.name
     available_animals = c.get_available_animals(rescue_id)
+    #available_animals = available_animals[:10]
 
     return render_template('rescue_info.html',
                            rescue_info=rescue_info,
@@ -220,6 +212,22 @@ def admin_signup():
 
     return render_template('signup_page.html',
                            title=title)
+
+
+@app.route('/handle-loading')
+def handle_dynamic_loading():
+    rescue_id = request.args.get("rescueid")
+    counter = int(request.args.get("counter"))
+    o = 10 + (counter*10)  # offset(skip) this many
+    animals = m.db.session.query(m.Animal).filter(
+        m.Animal.rescue_id == rescue_id, m.Animal.is_adopted == 'f', m.Animal.is_visible == 't').limit(10).offset(o).all()
+    my_html = ''
+    for animal in animals:
+        animal_id = animal.animal_id
+        animal_img = animal.img_url
+        a = '<br><a href = "/rescue/%s/animal/%s"><img alt="portrait" src = "/%s"></a><br>' % (rescue_id, animal_id, animal_img)
+        my_html = my_html + a
+    return my_html
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

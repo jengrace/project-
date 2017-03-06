@@ -2,9 +2,40 @@
 {% block content %}
 
   <div>
-    Please contact jenniferanngrace@gmail.com to create an account providing<br>
-    your name, email address, and name of rescue. 
+    <b>Please fill out and submit your information below. I will get back to you
+    within 48 hours for an update on your account.</b>
   </div>
 
+  <br>
+  <br>
+
+  <form action='/handle-signup' enctype='multipart/form-data' method='POST'>
+    Name: <input type='text' name='name'></input>
+
+    <br>
+    <br>
+
+    Rescue Name: <input type='text' name='rescuename'></input>
+
+    <br>
+    <br>
+
+    Email: <input type='text' name='email'></input>
+
+    <br>
+    <br>
+    
+    Password: <input type='password' name='password'></input><br>
+
+    <br>
+    <br>
+
+    Confirm Password: <input type='password' name='passwordconf'></input><br>
+
+    <br>
+    <br>
+    
+    <input type='submit' value='Submit'>
+  </form>
 
 {% endblock %}

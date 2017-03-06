@@ -37,7 +37,7 @@ def get_available_animals(rescue_id):
     """
 
     return m.db.session.query(m.Animal).filter(
-        m.Animal.rescue_id == rescue_id, m.Animal.is_adopted == 'f', m.Animal.is_visible == 't').all()
+        m.Animal.rescue_id == rescue_id, m.Animal.is_adopted == 'f', m.Animal.is_visible == 't').limit(10).all()
 
 
 def get_admin_by_id(admin_id):
